@@ -2,10 +2,15 @@
 main :: IO()
 
 main = do
+    putStr ("Digite seu usuário: ")
     login <- getLine
+    putStrLn("Digite sua senha(Ela deve conter pelo menos 1 caracter especial dentro os listados [*, !, @, /, #]")
     senha <- getLine
-
-    print ("Usuario cadastrado! Bem vindo " ++ fst (cadastraUsuario login senha))
+    let loginCadastrado = fst (cadastraUsuario login senha)
+    if null loginCadastrado 
+        then print("Algo deu errado :'( Tente novamente")
+        else print ("Usuario cadastrado! Bem vindo " ++ loginCadastrado)
+     
 
 cadastraUsuario :: String -> String -> (String, String)
 cadastraUsuario login senha
