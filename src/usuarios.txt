@@ -1,2 +1,8 @@
 Login: user1
-Senha: abcdef*
+Senha: abcde*
+Login: user2
+Senha: asdf#a
+Login: user3
+Senha: abcgh!
+Login: junior
+Senha: alskjd#*
