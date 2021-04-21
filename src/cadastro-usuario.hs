@@ -8,30 +8,25 @@ main = do
     putStrLn("Digite sua senha:" ++ "\n "++"(Ela deve conter pelo menos 1 caracter especial dentro os listados [*, !, @, /, #]")
     senha <- getLine
 
-    writeIntoFile login senha
+
+    cadastraUsuario login senha
 
     
-    
-
-
--- Acho que essa parte ficou um pouco redundante, daí se tu conseguir
--- sintetizar em uma função só acho que fica melhor
---  
-writeIntoFile :: String -> String -> IO ()
-writeIntoFile login senha = do
-    file <- openFile "usuarios.txt" ReadMode
-    content <- hGetContents file
-    writeToFile login senha content
-    hClose file
-
-    removeFile "usuarios.txt"    
-    renameFile "./usuariosCorreto.txt" "./usuarios.txt" 
-
-cadastraUsuario :: String -> String -> IO()
-cadastraUsuario login senha  = 
+-- Função que irá cadastrar o usuário num arquivo .txt, mantendo um registro dos usuarios cadastrados
+cadastraUsuario :: String -> String -> IO ()
+cadastraUsuario login senha = 
     if validaCadastro login senha
-        then writeFile login senha
-        else putStrLn "Não foi possível realizar seu cadastro"        
+        then
+            do
+            file <- openFile "usuarios.txt" ReadMode
+            content <- hGetContents file
+            writeToFile login senha content
+            hClose file
+
+            removeFile "usuarios.txt"    
+            renameFile "./usuariosCorreto.txt" "./usuarios.txt" 
+            putStrLn "Cadastro realizado com sucesso"
+        else putStrLn "Cadastro não realizado"
 
 -- -- Função que vai ser responsável por validar o cadastro do Usuário
 -- -- Login não pode ser vazio
