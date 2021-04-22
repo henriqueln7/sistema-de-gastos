@@ -3,15 +3,42 @@ import System.Directory
 
 main :: IO()
 main = do
-    putStr ("Digite seu usuário: ")
-    login <- getLine
-    putStrLn("Digite sua senha:" ++ "\n "++"(Ela deve conter pelo menos 1 caracter especial dentro os listados [*, !, @, /, #]")
-    senha <- getLine
+    menuInicial
 
+    inputOpcao <- getLine
+    let opcao = head inputOpcao
 
-    cadastraUsuario login senha
+    if opcao == 'L' then do
+        -- LOGIN
+        putStr ("\n" ++ "Login: ")
+        login <- getLine
+        putStr ("Senha: ")
+        senha <- getLine
 
+        putStr ("\n" ++ "Login" ++ "\n\n")
+
+    else if opcao == 'C' then do
+        -- CADASTRAR
+        putStr ("\n" ++ "Digite seu usuário: ")
+        login <- getLine
+        putStrLn("\n" ++ "Digite sua senha:" ++ "\n "++"(Ela deve conter pelo menos 1 caracter especial dentro os listados [*, !, @, /, #]")
+        senha <- getLine
     
+        cadastraUsuario login senha
+
+    else if opcao == 'S' then do
+        putStr ("\n" ++ "Ate logo!" ++ "\n\n")
+
+    else do
+        -- ERROR
+        putStrLn ("\nDigite algo valido!\n")
+        main
+
+-- Função que apresenta o menu inicial
+menuInicial :: IO ()
+menuInicial = do 
+    putStr("Bem vindo!\n\nSelecione uma das opções:\n\n  (L) Login\n  (C) Cadastrar usuário\n  (S) Sair\n \nOpção> ")
+
 -- Função que irá cadastrar o usuário num arquivo .txt, mantendo um registro dos usuarios cadastrados
 cadastraUsuario :: String -> String -> IO ()
 cadastraUsuario login senha = 
@@ -25,8 +52,8 @@ cadastraUsuario login senha =
 
             removeFile "usuarios.txt"    
             renameFile "./usuariosCorreto.txt" "./usuarios.txt" 
-            putStrLn "Cadastro realizado com sucesso"
-        else putStrLn "Cadastro não realizado"
+            putStrLn "\nCadastro realizado com sucesso\n"
+        else putStrLn "\nCadastro não realizado\n"
 
 -- -- Função que vai ser responsável por validar o cadastro do Usuário
 -- -- Login não pode ser vazio
