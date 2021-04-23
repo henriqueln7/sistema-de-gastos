@@ -1,4 +1,5 @@
 import System.IO
+import System.Directory
 import Data.Char
 import Data.List
 import Data.List.Split (splitOn)
@@ -26,9 +27,11 @@ menuLogin = do
 			putStr "\nLogin: "
 	
 			login <- getLine
+
+			arquivo <- readFile "dados/usuarios.txt"
 			
-			if existeLogin login
-				then exibirUsuario login
+			if existeLogin login arquivo
+				then print(exibirUsuario login arquivo)
 				else putStrLn "Usuario não cadastrado"
 			
 
@@ -74,13 +77,13 @@ cadastraUsuario login senha =
     if validaCadastro login senha
         then
             do
-            file <- openFile "usuarios.txt" ReadMode
+            file <- openFile "dados/usuarios.txt" ReadMode
             content <- hGetContents file
             writeToFile login senha content
             hClose file
 
-            removeFile "usuarios.txt"    
-            renameFile "./usuariosCorreto.txt" "./usuarios.txt" 
+            removeFile "dados/usuarios.txt"    
+            renameFile "dados/usuariosCorreto.txt" "dados/usuarios.txt" 
             putStrLn "Cadastro realizado com sucesso"
         else putStrLn "Cadastro não realizado"
 
@@ -100,8 +103,8 @@ validaCadastro login senha =
 writeToFile :: String -> String -> String -> IO ()      
 writeToFile login senha conteudo = do
     if (null conteudo)
-        then writeFile "./usuariosCorreto.txt" ("Login: " ++ login ++ "\n" ++ "Senha: " ++ senha)
-        else writeFile "./usuariosCorreto.txt" (conteudo ++ "\n" ++ "Login: " ++ login ++ "\n" ++ "Senha: " ++ senha)
+        then writeFile "dados/usuariosCorreto.txt" ("Login: " ++ login ++ "\n" ++ "Senha: " ++ senha)
+        else writeFile "dados/usuariosCorreto.txt" (conteudo ++ "\n" ++ "Login: " ++ login ++ "\n" ++ "Senha: " ++ senha)
 
 -------------------------------------------------------------------------------------
 
@@ -115,14 +118,16 @@ writeToFile login senha conteudo = do
 getListaLogin :: [[String]] -> String -> [[String]]
 getListaLogin lista login = Data.List.filter (login `elem`) lista
 
-existeLogin :: [String] -> Bool
-existeLogin login = do
+existeLogin :: String -> String -> Bool
+existeLogin login arquivo = do
     let lista_usuarios = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_login = getListaLogin lista_usuarios login
     if null lista_login
-        then True
-        else False
+        then False
+        else True
 
 
-exibirUsuario :: String -> [String]
-exibirUsuario login = getListaLogin !! 0
+exibirUsuario :: String -> String -> [String]
+exibirUsuario login arquivo = do
+	let lista_login = getListaLogin ((Data.List.map ( splitOn ",") (lines arquivo))) login
+	head lista_login
