@@ -1,17 +1,8 @@
+module CadastroUsuario where    
+
 import System.IO
 import System.Directory
 
-main :: IO()
-main = do
-    putStr ("Digite seu usuário: ")
-    login <- getLine
-    putStrLn("Digite sua senha:" ++ "\n "++"(Ela deve conter pelo menos 1 caracter especial dentro os listados [*, !, @, /, #]")
-    senha <- getLine
-
-
-    cadastraUsuario login senha
-
-    
 -- Função que irá cadastrar o usuário num arquivo .txt, mantendo um registro dos usuarios cadastrados
 cadastraUsuario :: String -> String -> IO ()
 cadastraUsuario login senha = 
