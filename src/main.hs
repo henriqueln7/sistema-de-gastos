@@ -80,7 +80,40 @@ menuLogin = do
 
 menuUsuario :: String -> IO()
 menuUsuario login = do
-	putStrLn "NAO IMPLEMENTADO\n"
+	putStr ("Selecione uma das opções:\n\n" ++ 
+		"  (1) Registar conta de banco\n" ++ 
+		"  (2) Registrar cartao de credito\n" ++ 
+		"  (3) Verificar saldo total\n" ++ 
+		"  (4) Definir metas\n" ++ 
+		"  (5) Gerar extrato\n" ++ 
+		"  (6) Sair\n\n" ++
+		"Opção> ")
+
+	opcao <- getLine 
+
+	if (opcao) == "1"
+		then do
+
+	else if (opcao) == "2"
+		then do
+
+	else if (opcao) == "3"
+		then do
+
+	else if (opcao) == "4"
+		then do
+
+	else if (opcao) == "5"
+		then do
+
+	else if (opcao) == "6"
+		then do
+			putStrLn "\nAte logo!"
+
+	else 
+		do
+			putStrLn "\nOpcao invalida!\n"
+			menuUsuario
 
 
 

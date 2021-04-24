@@ -63,32 +63,3 @@ constroiBanco lista = Banco.Banco {
 
 
 
-
-
-
-
-
-
-
-{- COMENTEI PQ NAO TAVA FUNCIONANDO
-
-
---Retorna a lista de um usuário cadastrado no sistema
---Caso o usuário não esteja cadastrado ele retorna uma lista vazia
-getListaLogin :: [[String]] -> String -> [[String]]
-getListaLogin lista login = Data.List.filter (login `elem`) lista
-
-existeLogin :: [String] -> IO(Bool)
-existeLogin login = do
-    arquivo <- readFile "dados/logins.txt"
-    let lista_usuarios = ((Data.List.map ( splitOn ",") (lines arquivo)))
-    let lista_login = getListaLogin lista_usuarios login
-    if Data.List.null lista_login
-        then return True
-        else return False
-
-
-exibirUsuario :: String -> IO(Usuario.Usuario)
-exibirUsuario login = getListaLogin login !! 0
-    
--}    
