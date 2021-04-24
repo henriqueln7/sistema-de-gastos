@@ -39,7 +39,7 @@ menuLogin = do
 			if existeLogin login arquivo
 				then 
 					if verificaSenha login senha arquivo
-						then fazerLogin login 
+						then menuUsuario login 
 						else putStrLn "Senha incorreta. Tente novamente\n"
 				else putStrLn "Usuario não existe. Tente novamente com outro login\n"
 			
@@ -78,8 +78,8 @@ menuLogin = do
 			menuLogin
 
 
-fazerLogin :: String -> IO()
-fazerLogin login = do
+menuUsuario :: String -> IO()
+menuUsuario login = do
 	putStrLn "NAO IMPLEMENTADO\n"
 
 
