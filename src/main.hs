@@ -39,11 +39,18 @@ menuLogin = do
 			if existeLogin login arquivo
 				then 
 					if verificaSenha login senha arquivo
-						then menuUsuario login 
-						else putStrLn "Senha incorreta. Tente novamente\n"
-				else putStrLn "Usuario não existe. Tente novamente com outro login\n"
-			
-			menuLogin
+						then 
+							do
+							putStrLn ("Bem vindo " ++ login ++ "!\n")
+							menuUsuario (toUpperCase login) 
+						else 
+							do
+							putStrLn "Senha incorreta. Tente novamente\n"
+							menuLogin
+				else 
+					do
+					putStrLn "Usuario não existe. Tente novamente com outro login\n"
+					menuLogin
 
 			
 	else if (toUpperCase opcao) == "C"
@@ -70,7 +77,7 @@ menuLogin = do
 			
 	else if (toUpperCase opcao) == "S"
 		then do
-			putStrLn "\nAte logo!"
+			putStrLn "Ate logo!\n"
 
 	else 
 		do
@@ -93,27 +100,63 @@ menuUsuario login = do
 
 	if (opcao) == "1"
 		then do
+			
+			putStr "\nNome do banco: "
+			nome <- getLine 
+			putStr "Saldo: "
+			saldo <- getLine
+
+			arquivo <- readFile "dados/usuarios.txt"
+			
+			let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
+			let lista_nova = (Auxiliar.adicionaBanco login nome saldo lista)
+
+			let string_nova = Auxiliar.tranformaListaEmString lista_nova
+
+			removeFile "dados/usuarios.txt"
+			writeFile "dados/usuarios.txt" string_nova
+
+			menuUsuario login
 
 	else if (opcao) == "2"
 		then do
 
+			putStrLn "NAO IMPLEMENTADO"
+
+			menuUsuario login
+
 	else if (opcao) == "3"
 		then do
+			
+			
+			arquivo <- readFile "dados/usuarios.txt"
+   			let usuarios = Auxiliar.getListaDeUsuarios arquivo
+			let saldo = Auxiliar.verificaSaldoTotal login usuarios
+
+			putStrLn ("Seu saldo é de R$ " ++ (show saldo) ++ "\n")
+			
+			menuUsuario login
 
 	else if (opcao) == "4"
 		then do
+			putStrLn "NAO IMPLEMENTADO"
+
+			menuUsuario login
 
 	else if (opcao) == "5"
 		then do
+			putStrLn "NAO IMPLEMENTADO"
+
+			menuUsuario login
 
 	else if (opcao) == "6"
 		then do
-			putStrLn "\nAte logo!"
+			putStrLn "Ate logo!\n"
 
 	else 
 		do
-			putStrLn "\nOpcao invalida!\n"
-			menuUsuario
+			putStrLn "Opcao invalida!\n"
+			menuUsuario login
 
 
 
@@ -150,8 +193,8 @@ validaCadastro login senha =
 
 
 
-carregaUsuarios :: IO([Usuario.Usuario])
-carregaUsuarios = Auxiliar.getListaDeUsuarios 
+-- carregaUsuarios :: [Usuario.Usuario]
+-- carregaUsuarios = Auxiliar.getListaDeUsuarios 
 
 
 

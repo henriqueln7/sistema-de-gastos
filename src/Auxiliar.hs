@@ -28,12 +28,11 @@ Usuario {login = "nicolas", senha = "222", bancos = ["Inter 200"]},
 Usuario {login = "henrique", senha = "333", bancos = ["Pan 300"]},
 Usuario {login = "vh", senha = "444", bancos = ["Santander 400"]}]
 -}
-getListaDeUsuarios :: IO([Usuario.Usuario])
-getListaDeUsuarios = do
-    arquivo <- readFile "dados/usuarios.txt"
+getListaDeUsuarios :: String -> [Usuario.Usuario]
+getListaDeUsuarios arquivo = do
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_usuarios = ((Data.List.map constroiUsuario lista))
-    return lista_usuarios   
+    lista_usuarios   
 
 -- String inicial ["raphael","senhaDeRaphael","Nubank 120", "Inter 200"]
 constroiUsuario :: [String] -> Usuario.Usuario
@@ -59,7 +58,31 @@ constroiBanco lista = Banco.Banco {
     Banco.saldo = (read (last lista))
 }
 
+-- "user2" "nubank" "120" [["user1","senha"],["user2","senha"],["user3","senha"]]           ENTRADA
+-- [["user1","senha"],["user2","senha","nubank 120"],["user3","senha"]]                     SAIDA
+adicionaBanco :: String -> String -> String -> [[String]] -> [[String]]
+adicionaBanco login banco saldo [] = []
+adicionaBanco login banco saldo (h:t) = 
+    if (h !! 0 == login)
+        then do [h ++ [(banco ++ " " ++ saldo)]] ++ adicionaBanco login banco saldo t
+        else [h] ++ adicionaBanco login banco saldo t
+
+{- Recebe uma lista de lista de string e tranforma em uma string
+[["user1","senha"],["user2","senha","nubank 120"],["user3","senha"]]                   ENTRADA
+
+user1,senha
+user2,senha,nubank 120                                                                 SAIDA
+user3,senha                      -}
+tranformaListaEmString :: [[String]] -> String 
+tranformaListaEmString [] = ""
+tranformaListaEmString (h:t) = intercalate "," h ++ "\n" ++ tranformaListaEmString t
 
 
 
 
+verificaSaldoTotal :: String -> [Usuario.Usuario] -> Float 
+verificaSaldoTotal login (h:t) = 
+    if login == Usuario.login h
+        then Usuario.getSaldoTotal h
+        else verificaSaldoTotal login t
+    

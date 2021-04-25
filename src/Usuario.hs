@@ -6,11 +6,8 @@ data Usuario = Usuario {login :: String, senha :: String, bancos :: [Banco.Banco
 
 
 getSaldoTotal :: Usuario -> Float 
-getSaldoTotal user = sum (getListaDeSaldos (bancos user))
+getSaldoTotal user = Banco.somaSaldoDeBancos (bancos user)
 
-getListaDeSaldos :: [Banco.Banco] -> [Float] 
-getListaDeSaldos [] = []
-getListaDeSaldos (h:t) = Banco.saldo h : getListaDeSaldos t
 
 
 
