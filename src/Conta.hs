@@ -7,6 +7,7 @@ instance Eq Conta where
 
 data CartaoCredito = CartaoCredito {cartaoNome :: String, cartaoLimite :: Float, dataVencimento :: String, cvv :: String} deriving (Eq, Show, Read)
 
+-- Por enquanto esse usuário é praticamente uma imitação do usuário que existe em Usuario.hs. Coloquei aqui apenas para fins de discussões sobre como devemos representar o usuário :)
 data Usuario = Usuario {login :: String, senha :: String, contas :: [Conta], cartoesCredito :: [CartaoCredito]} deriving (Show)
 
 type InformacaoConta = (String, Double)
