@@ -1,7 +1,9 @@
 module CadastroUsuario where    
 
+import Auxiliar as Auxiliar
 import System.IO
 import System.Directory
+import Data.Char
 
 -- Função que irá cadastrar o usuário num arquivo .txt, mantendo um registro dos usuarios cadastrados
 cadastraUsuario :: String -> String -> IO ()
@@ -9,15 +11,13 @@ cadastraUsuario login senha =
     if validaCadastro login senha
         then
             do
-            file <- openFile "usuarios.txt" ReadMode
-            content <- hGetContents file
-            writeToFile login senha content
-            hClose file
-
-            removeFile "usuarios.txt"    
-            renameFile "./usuariosCorreto.txt" "./usuarios.txt" 
-            putStrLn "Cadastro realizado com sucesso"
-        else putStrLn "Cadastro não realizado"
+            appendFile "dados/usuarios.txt" ((Auxiliar.toUpperCase login) ++ "," ++ senha ++ "\n")
+            putStrLn "Cadastro realizado com sucesso\n"
+            
+        else 
+            do
+            putStrLn "Nao foi possivel realizar o cadastro. Tente novamente\n"
+            
 
 -- -- Função que vai ser responsável por validar o cadastro do Usuário
 -- -- Login não pode ser vazio
@@ -31,9 +31,4 @@ validaCadastro login senha =
         then False
         else not (null (filter (`elem` ['*', '!', '@', '/', '#']) senha))
 
---Função que vai ser responsável por escrever os usuários em um arquivo
-writeToFile :: String -> String -> String -> IO ()      
-writeToFile login senha conteudo = do
-    if (null conteudo)
-        then writeFile "./usuariosCorreto.txt" ("Login: " ++ login ++ "\n" ++ "Senha: " ++ senha)
-        else writeFile "./usuariosCorreto.txt" (conteudo ++ "\n" ++ "Login: " ++ login ++ "\n" ++ "Senha: " ++ senha)
+
