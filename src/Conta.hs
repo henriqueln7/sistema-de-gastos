@@ -14,11 +14,13 @@ verificarSaldo usuario = map (\conta -> (contaNome conta, saldoConta conta)) (co
 data TipoTransacao = Receita | Despesa | Transferencia
 
 -- ContaTransacao é em qual conta a operação está sendo realizada
-data Transacao = Transacao {valorTransacao :: Double, dataTransacao :: String, contaTransacao :: Conta, tipoTransacao :: TipoTransacao}
+-- data Transacao = Transacao {valorTransacao :: Double, dataTransacao :: String, contaTransacao :: Conta, tipoTransacao :: TipoTransacao}
 
-registrarReceita :: Transacao -> Usuario ->  Usuario
--- registrarReceita transacao = let conta = contaTransacao transacao in  conta { saldoConta = saldoConta conta + valorTransacao transacao}
-registrarReceita Transacao {valorTransacao = valor, contaTransacao = conta} usuario = usuario {contas = contas usuario ++ [conta {saldoConta = saldoConta conta + valor}]}
+data CategoriaReceita = Emprestimo | Investimento | Salario | OutrasReceitas
+data TransacaoReceita = TransacaoReceita {valorTransacaoReceita :: Double, categoriaReceita :: CategoriaReceita, dataReceita :: String, contaDestino :: Conta}
+
+registrarReceita :: TransacaoReceita -> Usuario ->  Usuario
+registrarReceita TransacaoReceita {valorTransacaoReceita = valor, contaDestino = contaDestino} usuario = usuario {contas = contas usuario ++ [contaDestino {saldoConta = saldoConta contaDestino + valor}]}
 
 -- registrarDespesa :: Transacao -> Conta
 -- registrarDespesa transacao = let conta = contaTransacao transacao in conta {saldoConta = saldoConta conta - valorTransacao transacao}
