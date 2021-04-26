@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7dafbb4912bc0144631f0438ea5462fdb7bede78061a72e4b96329788597aaa9
+-- hash: 3954e30b0894dcfd3ce30b0c43c1fd5bdf07182f15b1c573165426fb080b7aa6
 
 name:           sistema-de-gastos
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       Auxiliar
       Banco
       CadastroUsuario
+      Conta
       Lib
       Usuario
   other-modules:
