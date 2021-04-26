@@ -93,7 +93,8 @@ menuUsuario login = do
 		"  (3) Verificar saldo total\n" ++ 
 		"  (4) Definir metas\n" ++ 
 		"  (5) Gerar extrato\n" ++ 
-		"  (6) Sair\n\n" ++
+		"  (6) Realizar transação\n" ++ 
+		"  (7) Sair\n\n" ++
 		"Opção> ")
 
 	opcao <- getLine 
@@ -151,7 +152,11 @@ menuUsuario login = do
 
 	else if (opcao) == "6"
 		then do
-			putStrLn "Ate logo!\n"
+			putStrLn "NÃO IMPLEMENTADO!\n"
+
+	else if (opcao) == "7"
+		then do
+			putStrLn "Até Logo!\n"
 
 	else 
 		do
