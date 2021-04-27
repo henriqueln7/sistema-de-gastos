@@ -1,7 +1,8 @@
 module Auxiliar where
 
-import qualified Usuario as Usuario
-import qualified Banco as Banco
+import Usuario
+import Banco 
+import Conta
 import Data.List
 import System.IO
 import Data.Map as Map 
@@ -42,7 +43,7 @@ constroiUsuario :: [String] -> Usuario.Usuario
 constroiUsuario lista = Usuario.Usuario {
     Usuario.login = lista !! 0,
     Usuario.senha = lista !! 1,
-    Usuario.bancos = (getListaDeBancos (Data.List.drop 2 lista))
+    Usuario.contas = (getListaContas (Data.List.drop 2 lista))
 }
 
 
@@ -84,39 +85,42 @@ toUpperCase palavra = [toUpper x | x <- palavra]
 
 
 
-
--- exibirUsuario :: String -> String -> [String]
--- exibirUsuario login arquivo = do
---     let lista_login = getListaLogin ((Data.List.map ( splitOn ",") (lines arquivo))) login
---     head lista_login
  
  {-
- ["Nubank 120", "Inter SA 200"]   EXEMPLO DE ENTRADA
+ ["Nubank|001|120|Corrente|Conta do Nubank", "InterSA|002|200|Poupanca|Conta Do Inter"] 
+ []  EXEMPLO DE ENTRADA
+ 
 
 
-[Banco {nome = "Nubank", saldo = 120.0},    SAIDA
- Banco {nome = "Inter SA", saldo = 200.0}]
+[Conta {nomeConta = "Nubank",contaCodigo="001", saldoConta=120.0, tipoConta=Corrente, descricao="Conta do Nubank"},    SAIDA
+ Conta {nomeConta = "InterSa",contaCodigo="002", saldoConta=200.0, tipoConta=Poupanca, descricao="Conta do Inter"}]
 -}
-getListaDeBancos :: [String] -> [Banco.Banco]
-getListaDeBancos arquivo = (Data.List.map constroiBanco (Data.List.map ( splitOn " ") (arquivo)))
+getListaContas :: [String] -> [Conta]
+-- getListaContas arquivo = (Data.List.map constroiConta(Data.List.map ( splitOn ",") (arquivo)))
+getListaContas arquivo = Data.List.map constroiConta arquivo
 
-constroiBanco :: [String] -> Banco.Banco
-constroiBanco lista = Banco.Banco {
-    Banco.nome = Data.List.intercalate " " (Data.List.take ((length lista) - 1) lista),
-    Banco.saldo = (read (last lista))
-}
+constroiConta :: String -> Conta
+constroiConta lista = do 
+    let listaConta = Data.List.Split.splitOn "|" lista in
+        Conta {
+            contaNome = listaConta !! 0,
+            contaCodigo = listaConta !! 1,
+            saldoConta = read (listaConta !! 2),
+            tipoConta = read (listaConta !! 3),
+            descricao = listaConta !! 4
+        }
+
 
 
 
 -- "user2" "nubank" "120" [["user1","senha"],["user2","senha"],["user3","senha"]]           ENTRADA
 -- [["user1","senha"],["user2","senha","nubank 120"],["user3","senha"]]                     SAIDA
-adicionaBanco :: String -> String -> String -> [[String]] -> [[String]]
-adicionaBanco login banco saldo [] = []
-adicionaBanco login banco saldo (h:t) = 
+adicionaConta :: String -> Conta -> [[String]] -> [[String]]
+adicionaConta login conta [] = []
+adicionaConta login conta (h:t) = 
     if (h !! 0 == login)
-        then do [h ++ [(banco ++ " " ++ saldo)]] ++ adicionaBanco login banco saldo t
-        else [h] ++ adicionaBanco login banco saldo t
-
+        then do [h ++ [(contaNome conta ++ "|" ++ contaCodigo conta ++ "|" ++ show (saldoConta conta) ++ "|" ++ show (tipoConta conta) ++ "|" ++ descricao conta)]] ++ adicionaConta login conta t
+        else [h] ++ adicionaConta login conta t
 
 
 {- Recebe uma lista de lista de string e tranforma em uma string
@@ -132,7 +136,7 @@ tranformaListaEmString (h:t) = intercalate "," h ++ "\n" ++ tranformaListaEmStri
 
 
 -- Verifica Saldo total das contas de um Usuario
-verificaSaldoTotal :: String -> [Usuario.Usuario] -> Float 
+verificaSaldoTotal :: String -> [Usuario] -> Double 
 verificaSaldoTotal login (h:t) = 
     if login == Usuario.login h
         then Usuario.getSaldoTotal h
