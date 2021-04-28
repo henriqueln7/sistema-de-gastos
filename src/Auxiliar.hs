@@ -12,34 +12,43 @@ import Data.List.Split (splitOn)
 
 
 {-
-raphael,111,Nubank 120,Itau 300, Bradesco 50
-nicolas,222,Inter 200                            -- LISTA INICIAL NO dados/usuarios.txt
-henrique,333,Pan 300
-vh,444,Santander 400
+raphael,111,Nubank|001|1300.0|Corrente|Conta do Nubank,Inter|002|1200.0|Poupança|Conta do Inter
+nicolas,222,BB|001|2000.0|Corrente|Conta do BB                            -- LISTA INICIAL NO dados/usuarios.txt
+henrique,333,Pan|001|1400.0|Corrente|Conta Pan
+vh,444,Santander|001|4000.0|Poupança|Conta Santander
 -}
 {-
-[["raphael","111","Nubank 120"],
-["nicolas","222","Inter 200"],      -- APOS EXECUTAR A LINHA 32
-["henrique","333","Pan 300"],
-["vh","444","Santander 400"]]
+[["raphael","111","Nubank|001|1300.0|Corrente|Conta do Nubank","Inter|002|1200.0|Poupança|Conta do Inter"],
+["nicolas","222","BB|001|2000.0|Corrente|Conta do BB"],      -- APOS EXECUTAR A LINHA 32
+["henrique","333","Pan|001|1400.0|Corrente|Conta Pan"],
+["vh","444","Santander|001|4000.0|Poupança|Conta Santander"]]
 -}
 
 {-SAIDA DA FUNCAO
-[Usuario {login = "raphael", senha = "111", bancos = ["Nubank 120","Itau 300"," Bradesco 50"]},
-Usuario {login = "nicolas", senha = "222", bancos = ["Inter 200"]},
-Usuario {login = "henrique", senha = "333", bancos = ["Pan 300"]},
-Usuario {login = "vh", senha = "444", bancos = ["Santander 400"]}]
+[Usuario {login = "raphael", senha = "111", contas = ["Nubank|001|1300.0|Corrente|Conta do Nubank","Inter|002|1200.0|Poupança|Conta do Inter"]},
+Usuario {login = "nicolas", senha = "222", contas = ["BB|001|2000.0|Corrente|Conta do BB"]},
+Usuario {login = "henrique", senha = "333", contas = ["Pan|001|1400.0|Corrente|Conta Pan"]},
+Usuario {login = "vh", senha = "444", contas = ["Santander|001|4000.0|Poupança|Conta Santander"]}]
 -}
-getListaDeUsuarios :: String -> [Usuario.Usuario]
+getListaDeUsuarios :: String -> [Usuario]
 getListaDeUsuarios arquivo = do
     let lista = ((Data.List.map ( splitOn ",") (lines arquivo)))
     let lista_usuarios = ((Data.List.map constroiUsuario lista))
     lista_usuarios   
 
 
+-- [Usuario {login = "raphael", senha = "111", contas = ["Nubank|001|1300.0|Corrente|Conta do Nubank","Inter|002|1200.0|Poupança|Conta do Inter"]},
+-- Usuario {login = "nicolas", senha = "222", contas = ["BB|001|2000.0|Corrente|Conta do BB"]},
+-- Usuario {login = "henrique", senha = "333", contas = ["Pan|001|1400.0|Corrente|Conta Pan"]},
+-- Usuario {login = "vh", senha = "444", contas = ["Santander|001|4000.0|Poupança|Conta Santander"]}
+--Ainda dando erro
+
+-- getUsuario :: [Usuario] -> String -> Usuario
+-- getUsuario usuarios login = 
+--     Data.List.filter (\usuario -> (login usuario) == login) usuarios
 
 -- String inicial ["raphael","senhaDeRaphael","Nubank 120", "Inter 200"]
-constroiUsuario :: [String] -> Usuario.Usuario
+constroiUsuario :: [String] -> Usuario
 constroiUsuario lista = Usuario.Usuario {
     Usuario.login = lista !! 0,
     Usuario.senha = lista !! 1,
