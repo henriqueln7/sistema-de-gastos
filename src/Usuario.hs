@@ -1,5 +1,5 @@
 module Usuario where
-import Banco  
+
 import Conta
 
 

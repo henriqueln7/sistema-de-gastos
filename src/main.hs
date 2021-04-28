@@ -1,6 +1,5 @@
 import Auxiliar as Auxiliar
 import Usuario as Usuario
-import Banco as Banco
 import Conta as Conta
 import CadastroUsuario as CadastroUsuario
 import System.IO
