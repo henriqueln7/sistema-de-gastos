@@ -1,23 +1,23 @@
-module CadastroUsuario where    
+module CadastroUsuario where
 
-import Auxiliar as Auxiliar
+import Auxiliar
 import System.IO
 import System.Directory
 import Data.Char
 
 -- Função que irá cadastrar o usuário num arquivo .txt, mantendo um registro dos usuarios cadastrados
 cadastraUsuario :: String -> String -> IO ()
-cadastraUsuario login senha = 
+cadastraUsuario login senha =
     if validaCadastro login senha
         then
             do
-            appendFile "dados/usuarios.txt" ((Auxiliar.toUpperCase login) ++ "," ++ senha ++ "\n")
+            appendFile "dados/usuarios.txt" (Auxiliar.toUpperCase login ++ "," ++ senha ++ "\n")
             putStrLn "Cadastro realizado com sucesso\n"
-            
-        else 
+
+        else
             do
             putStrLn "Nao foi possivel realizar o cadastro. Tente novamente\n"
-            
+
 
 -- -- Função que vai ser responsável por validar o cadastro do Usuário
 -- -- Login não pode ser vazio
@@ -26,9 +26,4 @@ cadastraUsuario login senha =
 validaCadastro :: String -> String -> Bool
 validaCadastro "" senha = False
 validaCadastro login "" = False
-validaCadastro login senha = 
-    if length senha <= 6
-        then False
-        else not (null (filter (`elem` ['*', '!', '@', '/', '#']) senha))
-
-
+validaCadastro login senha = length senha > 6 && any (`elem` ['*', '!', '@', '/', '#']) senha
