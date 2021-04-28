@@ -1,9 +1,7 @@
 module Auxiliar where
 
 import Usuario
-import Banco 
 import Conta
-import Data.List
 import System.IO
 import Data.Map as Map 
 import Data.List
