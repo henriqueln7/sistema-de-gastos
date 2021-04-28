@@ -152,8 +152,17 @@ menuUsuario login = do
 
 	else if (opcao) == "5"
 		then do
-			putStrLn "NAO IMPLEMENTADO"
+			putStr "Digite o valor da transação: "
+			valor <- getLine
+			putStr "Código da conta de origem: "
+			codigoOrigem <- getLine
+			putStr "Código da conta de destino"
+			codigoDestino <- getLine
+			
+			let contaOrigem = Conta.encontraConta contas contaOrigem
+			let contaOrigem = Conta.encontraConta contas contaDestino
 
+			
 			menuUsuario login
 
 	else if (opcao) == "6"
