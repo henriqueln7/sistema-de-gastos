@@ -27,3 +27,4 @@ validaCadastro :: String -> String -> Bool
 validaCadastro "" senha = False
 validaCadastro login "" = False
 validaCadastro login senha = length senha > 6 && any (`elem` ['*', '!', '@', '/', '#']) senha
+

@@ -3,7 +3,7 @@ module Conta where
 import Data.List.Split (splitOn)
 import Data.Maybe(fromJust)
 
-data TipoConta = Corrente | Poupanca | Carteira deriving (Show, Eq, Read)
+data TipoConta = CORRENTE | POUPANCA | CARTEIRA deriving (Show, Eq, Read)
 
 data Conta = Conta {contaNome :: String, contaCodigo :: String, saldoConta :: Double, tipoConta :: TipoConta, descricao :: String} deriving (Show, Read)
 
@@ -11,8 +11,10 @@ data Conta = Conta {contaNome :: String, contaCodigo :: String, saldoConta :: Do
 instance Eq Conta where
     c1 == c2 = (==) (contaCodigo c1) (contaCodigo c2)
 
+
+
 --ENTRADA 
---["Nubank|001|120|Corrente|Conta do Nubank", "InterSA|002|200|Poupanca|Conta Do Inter"]
+--["Nubank|001|120|CORRENTE|Conta do Nubank", "InterSA|002|200|POUPANCA|Conta Do Inter"]
 -- "001"
 
 -- SAIDA
@@ -22,7 +24,6 @@ encontraConta :: [String] -> String -> Conta
 encontraConta contas codigo = fromJust (encontraContaIter contas codigo 0)
 
 encontraContaIter :: [String] -> String -> Int -> Maybe Conta
-
 encontraContaIter contas codigoConta i
     | i >= length contas = Nothing
     | otherwise = let conta = splitOn "|" (contas !! i)
@@ -36,3 +37,4 @@ encontraContaIter contas codigoConta i
                                     descricao = conta !! 4
                                 }
                         else encontraContaIter contas codigoConta (i + 1)
+					
