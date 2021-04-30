@@ -20,7 +20,7 @@
 
 <p>
   
-  *If you do not have the Haskell Compiler Installed:
+  *If you do not have Stack Installed:
   
   Linux:
   curl -sSL https://get.haskellstack.org/ | sh
