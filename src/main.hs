@@ -7,6 +7,7 @@ import System.Directory
 import Data.Char
 import Data.List
 import Data.List.Split (splitOn)
+import Data.Maybe
 import Control.Exception
 
 
@@ -230,12 +231,16 @@ menuUsuario login = do
 							let usuarios_modificados = Data.List.delete ((Auxiliar.getUsuario usuarios login) !! 0) usuarios
 							let usuario_com_transferencia = Usuario.realizaTransacao transferencia
 
-							Auxiliar.persisteUsuarios (usuarios_modificados ++ [usuario_com_transferencia])
-							
-							Auxiliar.persisteTransferencia transferencia
-							putStrLn "\nTransferência efetuada com sucesso!\n"
-                            
 
+							if Data.Maybe.isNothing usuario_com_transferencia then
+								putStrLn "\nVocê não possui saldo suficiente nessa conta para realizar essa transferência :/\n"
+							else
+								do
+								Auxiliar.persisteUsuarios (usuarios_modificados ++ [Data.Maybe.fromJust usuario_com_transferencia])
+								
+								Auxiliar.persisteTransferencia transferencia
+								putStrLn "\nTransferência efetuada com sucesso!\n"
+                            
 			menuUsuario login
 
 
