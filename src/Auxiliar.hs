@@ -229,6 +229,8 @@ persisteUsuarios usuarios = do
 --NICOLASMNL,123456*,Inter|01|1200.0|CORRENTE|Conta do Inter,Nubank|02|13000.0|CORRENTE|Conta do Nubank de nicolas
 
 constroiStringdeUsuario :: Usuario -> String
+constroiStringdeUsuario Usuario{login=login, senha=senha, contas=[]} =
+    (toUpperCase login) ++ "," ++ senha
 constroiStringdeUsuario Usuario{login=login, senha=senha, contas=contas} =
     (toUpperCase login) ++ "," ++ senha ++ "," ++ constroiStringDeContas contas
 
@@ -242,7 +244,7 @@ constroiStringDeConta Conta{contaNome=contaNome,contaCodigo=contaCodigo, saldoCo
 
 persisteTransferencia :: Transferencia -> IO()
 persisteTransferencia transferencia = 
-    appendFile "dados/transferencias.txt" ((login (usuario transferencia)) ++ "," ++ (contaCodigo (contaOrigem transferencia)) ++ "," ++(contaCodigo (contaDestino transferencia)) ++ "," ++ (show (valor transferencia)) ++ "\n")
+    appendFile "dados/transferencias.txt" ((login (usuario transferencia)) ++ "," ++ (contaCodigo (contaOrigem transferencia)) ++ "," ++(contaCodigo (contaDestino transferencia)) ++ "," ++ (show (valor transferencia)) ++ ",Transferencia\n")
 
     -- [["NICOLASMNL","01","02","200.0"],["NICOLASMNL","01","02","2000.0"]]
 
@@ -257,8 +259,11 @@ geraExtrato login = do
 
 --    ["NICOLASMNL","01","02","200.0"]
 printaTransferenciasBonita :: [String] -> String
-printaTransferenciasBonita transferencias =
-    "\nUsuario: " ++ (transferencias !! 0) ++ "\nCódigo da Conta de Origem: " ++ (transferencias !! 1)  ++ "\nCódigo da Conta de Destino: " ++ (transferencias !! 2) ++ "\nValor da Transferência: " ++ (transferencias !! 3) ++ "\n"
+printaTransferenciasBonita transferencias 
+    | transferencias !! 1 == "SAQUE" = "\nTipo: " ++ (transferencias !! 1) ++ "\nCódigo da Conta: " ++ (transferencias !! 2) ++ "\nValor do saque: " ++ (transferencias !! 3) ++ "\n"
+    | transferencias !! 1 == "DEPÓSITO" = "\nTipo: "++ (transferencias !! 1) ++ "\nCódigo da Conta de Destino: " ++ (transferencias !! 2) ++ "\nValor do depósito: " ++ (transferencias !! 3) ++ "\n"
+    | otherwise = "\nTipo: TRANSFERÊNCIA" ++ "\nCódigo da Conta de Origem: " ++ (transferencias !! 1)  ++ "\nCódigo da Conta de Destino: " ++ (transferencias !! 2) ++ "\nValor da tranferência: " ++ (transferencias !! 3) ++ "\n"
+    
 
 
 
@@ -266,3 +271,77 @@ printaTransferenciasBonita transferencias =
 printaConta :: String -> String
 printaConta conta = let c = splitOn "|" conta in 
     "\nNome da Conta: " ++ (c !! 0) ++ "\nCódigo da Conta: " ++ (c !! 1) ++ "\nSaldo: " ++ (c !! 2) ++"\nTipo da Conta: " ++ (c !! 3) ++"\nDescrição da conta: " ++ (c !! 4)
+
+
+
+
+depositaNaContaDoUsuario :: String -> String -> String -> String -> IO()
+depositaNaContaDoUsuario login codigo valor arquivo = do
+    let lista_usuarios = getListaDeUsuarios arquivo
+    let user_antigo = (getUsuario lista_usuarios login) !! 0
+
+    if (Conta.existeConta codigo (Usuario.contas user_antigo))
+        then do
+            let user_novo = Usuario.Usuario {login = Usuario.login user_antigo, senha = Usuario.senha user_antigo, contas = procuraContaEDeposita codigo (read valor) (Usuario.contas user_antigo)}
+            let string_com_usuario_atualizado = atualizaTXTDeUsuarios login user_novo lista_usuarios
+
+            removeFile "dados/usuarios.txt"                      
+            writeFile "dados/usuarios.txt" string_com_usuario_atualizado
+
+            appendFile "dados/transferencias.txt" ((login) ++ ",DEPÓSITO," ++(codigo) ++ "," ++ (valor) ++ "\n")
+
+            putStrLn "\nValor depositado com sucesso\n"
+        else do
+            putStrLn "\nNão foi possível realizar o deposito, pois você não possui nenhuma conta com esse código\n"
+            
+
+
+procuraContaEDeposita :: String -> Double -> [Conta] -> [Conta]
+procuraContaEDeposita codigo valor [] = []
+procuraContaEDeposita codigo valor (h:t) = 
+    if (Conta.contaCodigo h == codigo)
+        then [Conta.depositaNaConta h valor] ++ procuraContaEDeposita codigo valor t
+        else [h] ++ procuraContaEDeposita codigo valor t
+
+
+retiraDaContaDoUsuario :: String -> String -> String -> String -> IO()
+retiraDaContaDoUsuario login codigo valor arquivo = do
+    let lista_usuarios = getListaDeUsuarios arquivo
+    let user_antigo = (getUsuario lista_usuarios login) !! 0
+
+    if (Conta.existeConta codigo (Usuario.contas user_antigo))
+        then do
+
+            let user_novo = Usuario.Usuario {login = Usuario.login user_antigo, senha = Usuario.senha user_antigo, contas = procuraContaESaca codigo (read valor) (Usuario.contas user_antigo)}
+
+            if (verificaValidadeDoSaque (Usuario.contas user_novo))
+                then do 
+
+                    let string_com_usuario_atualizado = atualizaTXTDeUsuarios login user_novo lista_usuarios
+
+                    removeFile "dados/usuarios.txt"                      
+                    writeFile "dados/usuarios.txt" string_com_usuario_atualizado
+
+                    appendFile "dados/transferencias.txt" ((login) ++ ",SAQUE," ++(codigo) ++ "," ++ (valor) ++ "\n")
+
+                    putStrLn "\nValor sacado com sucesso\n"
+                else do
+                    putStrLn "\nNão é possível sacar um valor maior do que o saldo disponível na conta\n"
+        else do
+            putStrLn "\nNão foi possível realizar o saque, pois você não possui nenhuma conta com esse código\n"
+
+
+procuraContaESaca :: String -> Double -> [Conta] -> [Conta]
+procuraContaESaca codigo valor [] = []
+procuraContaESaca codigo valor (h:t) =
+    if (Conta.contaCodigo h == codigo)
+        then [Conta.sacaDaConta h valor] ++ procuraContaESaca codigo valor t
+        else [h] ++ procuraContaESaca codigo valor t
+
+
+atualizaTXTDeUsuarios :: String -> Usuario -> [Usuario] -> String 
+atualizaTXTDeUsuarios login user_atualizado [] = ""
+atualizaTXTDeUsuarios login user_atualizado (h:t) = 
+    if Usuario.login h == login 
+        then constroiStringdeUsuario user_atualizado ++ "\n" ++ atualizaTXTDeUsuarios login user_atualizado t
+        else constroiStringdeUsuario h ++ "\n" ++ atualizaTXTDeUsuarios login user_atualizado t

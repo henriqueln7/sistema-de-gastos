@@ -37,4 +37,27 @@ encontraContaIter contas codigoConta i
                                     descricao = conta !! 4
                                 }
                         else encontraContaIter contas codigoConta (i + 1)
-					
+
+
+depositaNaConta :: Conta -> Double -> Conta
+depositaNaConta c valor = Conta{contaNome = (contaNome c), contaCodigo = (contaCodigo c), saldoConta = ((saldoConta c) + valor), tipoConta = (tipoConta c), descricao = (descricao c)}
+
+sacaDaConta :: Conta -> Double -> Conta
+sacaDaConta c valor = Conta{contaNome = (contaNome c), contaCodigo = (contaCodigo c), saldoConta = ((saldoConta c) - valor), tipoConta = (tipoConta c), descricao = (descricao c)}
+
+verificaValidadeDoSaque :: [Conta] -> Bool 
+verificaValidadeDoSaque [] = True
+verificaValidadeDoSaque (h:t) = 
+    if saldoConta h < 0
+        then False
+        else verificaValidadeDoSaque t 
+
+existeConta :: String -> [Conta] -> Bool 
+existeConta codigo [] = False 
+existeConta codigo (h:t) = 
+    if contaCodigo h == codigo
+        then True 
+        else existeConta codigo t
+
+
+

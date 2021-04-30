@@ -58,7 +58,7 @@ menuLogin = do
 												menuLogin
 						else
 								do
-								putStrLn "\nUsuario não existe. Tente novamente com outro login\n"
+								putStrLn "Usuario não existe. Tente novamente com outro login\n"
 								menuLogin
 
 
@@ -104,7 +104,9 @@ menuUsuario login = do
 			"  (4) Exibir metas\n" ++
 			"  (5) Gerar extrato\n" ++
 			"  (6) Realizar transação\n" ++
-			"  (7) Sair\n\n" ++
+			"  (7) Depositar na conta\n" ++
+			"  (8) Retirar dinheiro da conta\n" ++
+			"  (9) Sair\n\n" ++
 			"Opção> ")
 
 	opcao <- getLine
@@ -236,13 +238,45 @@ menuUsuario login = do
 
 			menuUsuario login
 
+
 	else if (opcao) == "7"
+		then do
+			
+
+			putStr "\nDigite o código da conta que você vai fazer o deposito: "
+			codigo <- getLine
+			putStr "Digite o valor a ser depositado: "
+			valor <- getLine
+
+			arquivo <- readFile "dados/usuarios.txt"
+
+			Auxiliar.depositaNaContaDoUsuario login codigo valor arquivo
+
+			menuUsuario login
+
+	else if (opcao) == "8"
+		then do
+			
+
+			putStr "\nDigite o código da conta que você vai fazer a retirada: "
+			codigo <- getLine
+			putStr "Digite o valor a ser retirado: "
+			valor <- getLine
+
+			arquivo <- readFile "dados/usuarios.txt"
+
+			Auxiliar.retiraDaContaDoUsuario login codigo valor arquivo
+
+			menuUsuario login
+
+	else if (opcao) == "9"
 		then do
 			putStrLn("\nAte Logo " ++ Data.List.map toLower login ++ "!\n")
 			menuLogin
 
-	else
+	else do 
 		putStrLn "Opcao invalida!\n"
+		menuUsuario login
 
 
                                 
