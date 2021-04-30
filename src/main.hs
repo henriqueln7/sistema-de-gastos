@@ -233,7 +233,7 @@ menuUsuario login = do
 
 
 							if Data.Maybe.isNothing usuario_com_transferencia then
-								putStrLn "Você não possui saldo suficiente nessa conta para realizar essa transferência :/"
+								putStrLn "\nVocê não possui saldo suficiente nessa conta para realizar essa transferência :/\n"
 							else
 								do
 								Auxiliar.persisteUsuarios (usuarios_modificados ++ [Data.Maybe.fromJust usuario_com_transferencia])
