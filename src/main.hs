@@ -152,9 +152,10 @@ menuUsuario login = do
 			descricaoMeta <- getLine
 			putStr "\nValor a ser alcançado: "
 			valorAlcancar <- getLine
-			putStrLn "Quanto você irá guardar por mês: "
+			putStr "Quanto você irá guardar por mês: "
 			valorPraGuardar <- getLine
-			putStr "Você já possui algum valor guardado? Digite 0 caso não possua nad "
+			putStrLn "Você já possui algum valor guardado? (Digite 0 caso não possua nada)"
+			putStr "Valor: "
 			carteira <- getLine
 
 

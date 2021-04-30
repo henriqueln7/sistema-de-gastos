@@ -1,4 +1,1 @@
-NICOLASMNL,Comprar um carro | 10000 | 1000 | 30000 | 20
-NICOLASMNL,Comprar uma casa | 50000 | 2000 | 200000 | 75
-NICOLASMNL,Comprar uma bike | 0 | 1000 | 2500 | 3
-NICOLASMNL,comprar caneta | 5 | 5 | 10 | 1
+NICOLASMNL,Comprar carro | 0 | 2000 | 14000 | 7
