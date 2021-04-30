@@ -205,13 +205,12 @@ verificaSaldoTotal login (h:t) =
 
 
 exibeMetas :: String -> String -> String
-exibeMetas login arquivo = do
-
+exibeMetas login arquivo =
     let lista_metas_geral = ((Data.List.map ( splitOn ",") (lines arquivo)))    
-    let lista_metas_filtrada = Data.List.filter (\meta -> head meta == login) lista_metas_geral
-    let metas_do_usuario = Data.List.map removeLoginDaLista lista_metas_filtrada
-    let string_final = transformaListaDeMetasEmString metas_do_usuario
-    string_final
+        lista_metas_filtrada = Data.List.filter (\meta -> head meta == login) lista_metas_geral
+        metas_do_usuario = Data.List.map removeLoginDaLista lista_metas_filtrada
+        string_final = transformaListaDeMetasEmString metas_do_usuario
+    in string_final
 
 removeLoginDaLista :: [String] -> [String]
 removeLoginDaLista (h:t) = splitOn " | " (t !! 0)
@@ -244,3 +243,26 @@ constroiStringDeConta Conta{contaNome=contaNome,contaCodigo=contaCodigo, saldoCo
 persisteTransferencia :: Transferencia -> IO()
 persisteTransferencia transferencia = 
     appendFile "dados/transferencias.txt" ((login (usuario transferencia)) ++ "," ++ (contaCodigo (contaOrigem transferencia)) ++ "," ++(contaCodigo (contaDestino transferencia)) ++ "," ++ (show (valor transferencia)) ++ "\n")
+
+    -- [["NICOLASMNL","01","02","200.0"],["NICOLASMNL","01","02","2000.0"]]
+
+geraExtrato :: String -> IO [String]
+geraExtrato login = do  
+    arquivo <- readFile "dados/transferencias.txt"
+    let lista_transferencias = ((Data.List.map ( splitOn ",") (lines arquivo)))
+
+    let transferencias = Data.List.filter (\l -> head l == login) lista_transferencias -- [Transferencia]
+    return (Data.List.map printaTransferenciasBonita transferencias)
+
+
+--    ["NICOLASMNL","01","02","200.0"]
+printaTransferenciasBonita :: [String] -> String
+printaTransferenciasBonita transferencias =
+    "\nUsuario: " ++ (transferencias !! 0) ++ "\nCódigo da Conta de Origem: " ++ (transferencias !! 1)  ++ "\nCódigo da Conta de Destino: " ++ (transferencias !! 2) ++ "\nValor da Transferência: " ++ (transferencias !! 3) ++ "\n"
+
+
+
+-- "Inter|01|1200.0|CORRENTE|Conta do Inter"  
+printaConta :: String -> String
+printaConta conta = let c = splitOn "|" conta in 
+    "\nNome da Conta: " ++ (c !! 0) ++ "\nCódigo da Conta: " ++ (c !! 1) ++ "\nSaldo: " ++ (c !! 2) ++"\nTipo da Conta: " ++ (c !! 3) ++"\nDescrição da conta: " ++ (c !! 4)

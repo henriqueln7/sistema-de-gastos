@@ -134,10 +134,12 @@ menuUsuario login = do
 				
 			arquivo <- readFile "dados/usuarios.txt"
 			let usuarios = Auxiliar.getListaDeUsuarios arquivo
+			let contas_usuario = Auxiliar.getContasUsuario login arquivo
 			let saldo = Auxiliar.verificaSaldoTotal login usuarios
-
-
-			putStrLn ("Seu saldo é de R$ " ++ (show saldo) ++ "\n")
+			
+			mapM_ putStrLn (map Auxiliar.printaConta contas_usuario )
+                        
+			putStrLn ("\nSeu saldo é de R$ " ++ (show saldo) ++ "\n")
 
 			menuUsuario login
 
@@ -172,8 +174,10 @@ menuUsuario login = do
 			arquivo <- readFile "dados/metas.txt"
 			
 			let metas = Auxiliar.exibeMetas login arquivo
-            
-			putStrLn metas
+
+			if (null metas)	
+				then putStrLn "\nVocê não possui metas!\n"
+				else putStrLn metas
 
 			menuUsuario login
 			
@@ -181,7 +185,13 @@ menuUsuario login = do
 	else if (opcao) == "5"
 		then do
 			
+			extrato <- Auxiliar.geraExtrato login
 
+			if (null extrato) then 
+				putStrLn "\nNão há extrato disponível! Faça alguma transferência antes :D\n"            
+			else
+				mapM_ putStrLn extrato
+			
 			menuUsuario login
 
 	else if (opcao) == "6"
