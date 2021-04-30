@@ -20,8 +20,8 @@ instance Eq Conta where
 -- SAIDA
 -- Conta {nomeConta="Nubank"...}
 -- OBS: Caso não haja nenhuma conta com o código, uma exceção será lançada.
-encontraConta :: [String] -> String -> Conta
-encontraConta contas codigo = fromJust (encontraContaIter contas codigo 0)
+encontraConta :: [String] -> String -> Maybe Conta
+encontraConta contas codigo = encontraContaIter contas codigo 0
 
 encontraContaIter :: [String] -> String -> Int -> Maybe Conta
 encontraContaIter contas codigoConta i

@@ -217,30 +217,33 @@ menuUsuario login = do
 					let contaDestino = Conta.encontraConta contas codigoDestino
 					let user = Auxiliar.getUsuario (Auxiliar.getListaDeUsuarios arquivo) login
 
-					if (null user)
-						then putStrLn "\nUsuário não cadastrado(O que você pensa que está fazendo??)"
-						else do
-							let transferencia = Transferencia {
-								usuario = (user !! 0),
-								contaOrigem = contaOrigem,
-								contaDestino = contaDestino,
-								valor = read valor
-							}
-							let usuarios = Auxiliar.getListaDeUsuarios arquivo
-							
-							let usuarios_modificados = Data.List.delete ((Auxiliar.getUsuario usuarios login) !! 0) usuarios
-							let usuario_com_transferencia = Usuario.realizaTransacao transferencia
-
-
-							if Data.Maybe.isNothing usuario_com_transferencia then
-								putStrLn "\nVocê não possui saldo suficiente nessa conta para realizar essa transferência :/\n"
-							else
-								do
-								Auxiliar.persisteUsuarios (usuarios_modificados ++ [Data.Maybe.fromJust usuario_com_transferencia])
+					if Data.Maybe.isNothing contaOrigem || Data.Maybe.isNothing contaDestino then
+						putStrLn "Conta não existente! Passe um código de conta válido."
+					else
+						if (null user)
+							then putStrLn "\nUsuário não cadastrado(O que você pensa que está fazendo??)"
+							else do
+								let transferencia = Transferencia {
+									usuario = (user !! 0),
+									contaOrigem = Data.Maybe.fromJust contaOrigem,
+									contaDestino = Data.Maybe.fromJust contaDestino,
+									valor = read valor
+								}
+								let usuarios = Auxiliar.getListaDeUsuarios arquivo
 								
-								Auxiliar.persisteTransferencia transferencia
-								putStrLn "\nTransferência efetuada com sucesso!\n"
-                            
+								let usuarios_modificados = Data.List.delete ((Auxiliar.getUsuario usuarios login) !! 0) usuarios
+								let usuario_com_transferencia = Usuario.realizaTransacao transferencia
+
+
+								if Data.Maybe.isNothing usuario_com_transferencia then
+									putStrLn "\nVocê não possui saldo suficiente nessa conta para realizar essa transferência :/\n"
+								else
+									do
+									Auxiliar.persisteUsuarios (usuarios_modificados ++ [Data.Maybe.fromJust usuario_com_transferencia])
+									
+									Auxiliar.persisteTransferencia transferencia
+									putStrLn "\nTransferência efetuada com sucesso!\n"
+								
 			menuUsuario login
 
 
