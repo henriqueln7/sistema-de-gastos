@@ -1,0 +1,5 @@
+
+usuario(nicolasmnl,senha1)
+usuario(victor,senha2)
+usuario(nicolas2,senha4,BB)
+usuario(arthur,123456,[BB])
