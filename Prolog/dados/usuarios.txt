@@ -1,5 +1,6 @@
 
-usuario(nicolasmnl,senha1)
-usuario(victor,senha2)
-usuario(nicolas2,senha4,BB)
-usuario(arthur,123456,[BB])
+usuario(nicolasmnl,abcedf12#,[])
+usuario(nicolasmnl,123456*,[])
+usuario(Joao,abcedfr@,[])
+usuario(nicolas1231,abcedef123#,[])
+usuario(joazinho,1234567*,[])
