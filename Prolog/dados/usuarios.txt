@@ -1,2 +1,4 @@
-'usuario(henriquelopes,senha1#)'.
-'usuario(nicolasmnl,senha2#)'.
+
+'usuario(henrique,senha1,[])'.
+'usuario(nicolas,senha2,[])'.
+'usuario(joaodasilva,senhajoao#,[])'.

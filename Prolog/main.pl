@@ -2,26 +2,8 @@
 
 %Preciso fazer ainda
 %	*Checagem se já existe Login na base na hora de cadastrar um usuario
-% main :- menuInicial, halt.
+main :- menuInicial, halt.
    
-
-
-main:-
-	open('dados/usuarios.txt',read,Str),
-	read_users(Str,Usuarios),
-	close(Str),
-	write(Usuarios),  nl.
-
-read_users(Stream,[]):-
-	at_end_of_stream(Stream).
-
-read_users(Stream,[X|L]):-
-	\+  at_end_of_stream(Stream),
-	read(Stream,X),
-	read_users(Stream,L).
-
-
-
 banner :-write("
 ░██████╗░░█████╗░░██████╗████████╗███████╗  ███╗░░░███╗███████╗███╗░░██╗░█████╗░░██████╗
 ██╔════╝░██╔══██╗██╔════╝╚══██╔══╝██╔════╝  ████╗░████║██╔════╝████╗░██║██╔══██╗██╔════╝
@@ -47,7 +29,9 @@ Opção> "),
 
 
 %Menu Usuario.
-menu("L") :- 
+menu("L") :- write("Login: "), lerEntrada(Login), write("Senha: "), lerEntrada(Senha), 
+
+(validaLogin(Login,Senha) ->
 	write("
 Selecione uma das opções:
 
@@ -61,8 +45,9 @@ Selecione uma das opções:
 (8) Realizar saque
 (9) Sair
 
-Opção> "),nl,halt.
+Opção> "); write("Login ou senha incorretos, tente novamente"), menu("L")),nl,halt.
 
+%Tivemos alguns problemas com os caracteres especiais, ai decidimos tirar por enquanto
 %Menu Cadastro Usuario.
 menu("C") :-
 	write("
@@ -75,16 +60,28 @@ A senha deve ter 6 ou mais caracteres e conter 1 caracter especial('*', '!', '@'
 	lerEntrada(Senha),
 	string_to_atom(Senha, AtomoSenha),
 	atom_chars(AtomoSenha,L),
-	(validaSenha(L) -> criaStringUser(Login, Senha, R),
-					   open('dados/usuarios.txt',append, Str),
-					   string_concat("'", R, R1),
+	criaStringUser(Login, Senha, Usuario),
+	(validaSenha(L) -> open('dados/usuarios.txt',append, Str),
+					   string_concat("'", Usuario, R1),
 					   string_concat(R1, "'", R2),
 					   string_concat(R2, ".", R3),
-					   writeln(Str, R3),
-					   close(Str), nl,write("Usuario Cadastrado"),nl, menuInicial; 
-		nl, write("Senha Invalida, por favor tente novamente"),nl, menu("C")).
+					   write(R3),
+					   (validaLogin(R3) -> write("Usuario já cadastrado"); 
+					   		writeln(Str, R3),
+					   		close(Str), nl,
+							write("Usuario Cadastrado"),nl, 
+							menuInicial); 
+		nl, write("Não foi possivel completar seu cadastro(Usuario ou senha já existem)"),nl, menu("C")).
 	
-criaStringUser(Login, Senha, Resposta) :- atom_string(Login, L), atom_string(Senha, S), string_concat(L, ",", R), string_concat(R, S, StringLoginSenha), string_concat(StringLoginSenha, ")", StringFinal), string_concat("usuario(", StringFinal, Resposta).
+criaStringUser(Login, Senha, Resposta) :- 
+	atom_string(Login, L), 
+	atom_string(Senha, S), 
+	string_concat(L, ",", R), 
+	string_concat(R, S, StringLoginSenha), 
+	string_concat(StringLoginSenha, ",[])", StringFinal), 
+	string_concat("usuario(", StringFinal, Resposta).
+
+
 %Recebo a senha como uma lista já
 validaSenha(Senha) :- checaCaracterEspecial(Senha), checaTamanho(Senha).
 checaTamanho(Senha) :- length(Senha, R), R > 5.
@@ -104,3 +101,32 @@ usuario(Nome, Senha, Conta, User) :- User = usuario(Nome, Senha, [Conta]).
 %Ainda não testado
 adicionaConta(Nome, Senha, Conta, NovoUser) :- usuario(Nome, Senha,Contas), append([Conta], Contas, NovasContas), NovoUser = usuario(Nome, Senha, NovasContas).
 
+/*
+ENTRADA --- criaUserAtomo(nicolas, senha2)
+SAIDA --- 'usuario(nicolas,senha2,[])'
+*/
+criaUserAtomo(StringUser, R) :- 
+	atom_string(R,StringUser).
+
+validaLogin(Usuario) :- criaUserAtomo(Usuario, User), leUsuarios(L), verificaLogin(User, L).
+
+verificaLogin(_, []) :- false.
+verificaLogin(User, [H|T]) :- User == H; verificaLogin(User, T). 
+
+
+printErro(Login, Senha) :- (validaLogin(Login, Senha) -> write("Usuario já existe"); write("usuario n existe")).
+
+
+leUsuarios(R):-
+	open('dados/usuarios.txt',read,Str),
+	read_users(Str,Usuarios),
+	close(Str),
+	R = Usuarios.
+
+read_users(Stream,[]):-
+	at_end_of_stream(Stream).
+
+read_users(Stream,[X|L]):-
+	\+  at_end_of_stream(Stream),
+	read(Stream,X),
+	read_users(Stream,L).
