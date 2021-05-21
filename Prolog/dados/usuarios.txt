@@ -1,6 +1,2 @@
-
-usuario(nicolasmnl,abcedf12#,[])
-usuario(nicolasmnl,123456*,[])
-usuario(Joao,abcedfr@,[])
-usuario(nicolas1231,abcedef123#,[])
-usuario(joazinho,1234567*,[])
+'usuario(henriquelopes,senha1#)'.
+'usuario(nicolasmnl,senha2#)'.

@@ -2,7 +2,25 @@
 
 %Preciso fazer ainda
 %	*Checagem se já existe Login na base na hora de cadastrar um usuario
-main :- menuInicial, halt.
+% main :- menuInicial, halt.
+   
+
+
+main:-
+	open('dados/usuarios.txt',read,Str),
+	read_users(Str,Usuarios),
+	close(Str),
+	write(Usuarios),  nl.
+
+read_users(Stream,[]):-
+	at_end_of_stream(Stream).
+
+read_users(Stream,[X|L]):-
+	\+  at_end_of_stream(Stream),
+	read(Stream,X),
+	read_users(Stream,L).
+
+
 
 banner :-write("
 ░██████╗░░█████╗░░██████╗████████╗███████╗  ███╗░░░███╗███████╗███╗░░██╗░█████╗░░██████╗
@@ -57,13 +75,16 @@ A senha deve ter 6 ou mais caracteres e conter 1 caracter especial('*', '!', '@'
 	lerEntrada(Senha),
 	string_to_atom(Senha, AtomoSenha),
 	atom_chars(AtomoSenha,L),
-	(validaSenha(L) -> usuario(Login, Senha, User),
+	(validaSenha(L) -> criaStringUser(Login, Senha, R),
 					   open('dados/usuarios.txt',append, Str),
-					   writeln(Str, User),
+					   string_concat("'", R, R1),
+					   string_concat(R1, "'", R2),
+					   string_concat(R2, ".", R3),
+					   writeln(Str, R3),
 					   close(Str), nl,write("Usuario Cadastrado"),nl, menuInicial; 
 		nl, write("Senha Invalida, por favor tente novamente"),nl, menu("C")).
 	
-
+criaStringUser(Login, Senha, Resposta) :- atom_string(Login, L), atom_string(Senha, S), string_concat(L, ",", R), string_concat(R, S, StringLoginSenha), string_concat(StringLoginSenha, ")", StringFinal), string_concat("usuario(", StringFinal, Resposta).
 %Recebo a senha como uma lista já
 validaSenha(Senha) :- checaCaracterEspecial(Senha), checaTamanho(Senha).
 checaTamanho(Senha) :- length(Senha, R), R > 5.
