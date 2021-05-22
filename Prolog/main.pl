@@ -48,7 +48,9 @@ Selecione uma das opções:
 (8) Realizar saque
 (9) Sair
 
-Opção> "); 
+Opção> "),
+	lerNumero(Entrada), 
+	menu(Entrada); 
 	write("Login ou senha incorretos, tente novamente"), menu("L")),nl,halt.
 
 %Tivemos alguns problemas com os caracteres especiais, ai decidimos tirar por enquanto
@@ -74,7 +76,26 @@ A senha deve ter 6 ou mais caracteres e conter 1 caracter especial('*', '!', '@'
 					   write("Cadastro efetuado com sucesso"),
 					   menuInicial;
 		nl, write("Não foi possivel completar seu cadastro"),nl, menu("C")).
-	
+
+
+%Essa parte vai ser responsável por cada opção disponível para o usuário, definidos no menu("L"). 
+% Podemos adicionar aquela função de adicionar dinheiro numa meta como sugerido por Everton para que no futuro ela possa ser eliminada(quando o dinheiro for alcançado)
+menu(1):- write("Registrar conta de banco").
+
+menu(2) :- write("Visualizar contas").
+
+menu(3) :- write("Definir metas").
+
+menu(4) :- write("Exibir metas").
+
+menu(5) :- write("Gerar extrato").
+
+menu(6) :- write("Realizar Transação").
+
+menu(7) :- write("Depositar na conta").
+
+menu(8) :- write("Realizar saque").
+
 
 
 
