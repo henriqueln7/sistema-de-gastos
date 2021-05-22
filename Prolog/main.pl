@@ -35,6 +35,7 @@ menu("L") :- write("Login: "), lerEntrada(Login), write("Senha: "), lerEntrada(S
 	criaUserAtomo(User, U),
 
 (validaLogin(U) ->
+	nl, write("Bem vindo "), write(Login), nl,
 	write("
 Selecione uma das opções:
 
@@ -80,6 +81,7 @@ A senha deve ter 6 ou mais caracteres e conter 1 caracter especial('*', '!', '@'
 
 %Essa parte vai ser responsável por cada opção disponível para o usuário, definidos no menu("L"). 
 % Podemos adicionar aquela função de adicionar dinheiro numa meta como sugerido por Everton para que no futuro ela possa ser eliminada(quando o dinheiro for alcançado)
+%O que precisamos fazer agora: Pegar o usuario correspondente cadastrado**
 menu(1):- write("Registrar conta de banco").
 
 menu(2) :- write("Visualizar contas").
