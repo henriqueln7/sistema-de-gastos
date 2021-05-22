@@ -1,4 +1,8 @@
 
-'usuario(henrique,senha1,[])'.
-'usuario(nicolas,senha2,[])'.
-'usuario(joaodasilva,senhajoao#,[])'.
+'usuario(joaojunior,senhadele#,[])'.
+'usuario(nicolasmnl,n14mot92001#,[])'.
+'usuario(nicolasmnl,senha4!,[])'.
+'usuario(raphael,senha1#,[])'.
+'usuario(henrique,senha2#,[])'.
+'usuario(victorhugo,senha5@,[])'.
+'usuario(pedrojorge,abcedf#,[])'.
