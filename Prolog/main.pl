@@ -25,17 +25,57 @@ Selecione uma das opções abaixo:
 
 Opção> "),
 	lerEntrada(Opcao),
-	(Opcao =:= "S" -> write("Até Logo!"),nl, !; menu(Opcao)),
+	menu(Opcao),
 	halt.
+	
 
 
-%Menu Usuario.
-menu("L") :- write("Login: "), lerEntrada(Login), write("Senha: "), lerEntrada(Senha), 
-	criaStringUser(Login, Senha,User),
-	criaUserAtomo(User, U),
+menu("S") :- write("Até Logo"),nl, !.
 
-(validaLogin(U) ->
-	nl, write("Bem vindo "), write(Login), nl,
+%Menu Login.
+menu("L") :- 
+	write("Login: "), 
+	lerEntrada(Login), 
+	write("Senha: "), 
+	lerEntrada(Senha), 
+	leUsuarios(L),
+	(validaUsuario(Login, Senha, L) -> write("Bem vindo "), write(Login), nl, menuUsuario(Login);
+		write("\nLogin ou senha incorretos, tente novamente.\n"),nl, menu("L")).
+
+%Tivemos alguns problemas com os caracteres especiais, ai decidimos tirar por enquanto
+%Menu Cadastro Usuario.
+menu("C") :-
+	write("
+Crie um login e uma senha
+A senha deve ter 6 ou mais caracteres e conter 1 caracter especial('*', '!', '@', '/', '#')\n"
+),
+	write("\nLogin: "), 
+	lerEntrada(Login), 
+	atom_string(AtomoLogin,Login), %Atomo Login é o Login mas no tipo Atomo
+
+	write("Senha: "), 
+	lerEntrada(Senha),
+	string_to_atom(Senha, AtomoSenha), %Atomo Senha é o Senha mas no tipo Atomo
+	atom_chars(AtomoSenha,ListaSenha), %Transformando a senha em uma lista para verificações
+	
+	criaStringUser(Login, Senha, Usuario), %Cria a string usuario(Login,Senha,[])
+	
+	leUsuarios(Usuarios),
+	(existeLogin(AtomoLogin, Usuarios) -> write("Usuario já cadastrado, tente novamente!"), nl, menu("C");
+		validaSenha(ListaSenha) -> salvaUsuario(Usuario),
+								   write("Usuário cadastrado com sucesso"), menuInicial;
+			write("Senha inválida, tente novamente"), nl,menu("C")).
+
+
+menu(_) :- write("Opção invalida!"),nl, menuInicial.
+
+
+%Essa parte vai ser responsável por cada opção disponível para o usuário, definidos no menuUsuario(Login). 
+% Podemos adicionar aquela função de adicionar dinheiro numa meta como sugerido por Everton para que no futuro ela possa ser eliminada(quando o dinheiro for alcançado)
+%O que precisamos fazer agora: Pegar o usuario correspondente cadastrado**
+
+
+menuUsuario(Login) :-
 	write("
 Selecione uma das opções:
 
@@ -50,53 +90,37 @@ Selecione uma das opções:
 (9) Sair
 
 Opção> "),
-	lerNumero(Entrada), 
-	menu(Entrada); 
-	write("Login ou senha incorretos, tente novamente"), menu("L")),nl,halt.
-
-%Tivemos alguns problemas com os caracteres especiais, ai decidimos tirar por enquanto
-%Menu Cadastro Usuario.
-menu("C") :-
-	write("
-Crie um login e uma senha
-A senha deve ter 6 ou mais caracteres e conter 1 caracter especial('*', '!', '@', '/', '#')\n"
-),
-	write("\nLogin: "), 
-	lerEntrada(Login), 
-	write("Senha: "), 
-	lerEntrada(Senha),
-	string_to_atom(Senha, AtomoSenha),
-	atom_chars(AtomoSenha,L),
-	criaStringUser(Login, Senha, Usuario),
-	(validaSenha(L) -> open('dados/usuarios.txt',append, Str),
-					   string_concat("'", Usuario, R1),
-					   string_concat(R1, "'", R2),
-					   string_concat(R2, ".", R3),
-					   writeln(Str, R3),
-					   close(Str),
-					   write("Cadastro efetuado com sucesso"),
-					   menuInicial;
-		nl, write("Não foi possivel completar seu cadastro"),nl, menu("C")).
+	lerNumero(Opcao), 
+	opcoesUsuario(Login, Opcao).
 
 
-%Essa parte vai ser responsável por cada opção disponível para o usuário, definidos no menu("L"). 
-% Podemos adicionar aquela função de adicionar dinheiro numa meta como sugerido por Everton para que no futuro ela possa ser eliminada(quando o dinheiro for alcançado)
-%O que precisamos fazer agora: Pegar o usuario correspondente cadastrado**
-menu(1):- write("Registrar conta de banco").
+opcoesUsuario(Login, 1) :-
+	write("\nNome da conta: "),
+	lerEntrada(NomeConta),
+	write("Codigo da Conta: "),
+	lerEntrada(Codigo),
+	write("Saldo: "),
+	lerNumero(Saldo),
+	write("Tipo da Conta: "),
+	lerEntrada(TipoConta),
+	write("Descrição da Conta: "),
+	lerEntrada(Descricao),
+	leUsuarios(Usuarios),
+	getUsuario(Login, Usuarios, User),
+	adicionaConta(Login, NomeConta,Codigo, Saldo, TipoConta, Descricao, UsuarioFinal),
+	delete(Usuarios, User, UsuariosNovo),
+	append([UsuarioFinal], UsuariosNovo, UsuariosFinais),
+	salvaTodosUsuarios(UsuariosFinais).
 
-menu(2) :- write("Visualizar contas").
-
-menu(3) :- write("Definir metas").
-
-menu(4) :- write("Exibir metas").
-
-menu(5) :- write("Gerar extrato").
-
-menu(6) :- write("Realizar Transação").
-
-menu(7) :- write("Depositar na conta").
-
-menu(8) :- write("Realizar saque").
+opcoesUsuario(Login, 2) :- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 3):- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 4):- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 5):- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 6):- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 7):- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 8):- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 9) :- write('Ate logo '), write(Login), menuInicial.
+opcoesUsuario(Login, _) :- write("Opção Inválida, tente novamente.", menuUsuario(Login)).
 
 
 
