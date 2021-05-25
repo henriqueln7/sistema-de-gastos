@@ -29,8 +29,9 @@ criaUserComContas(Login, Senha, Conta, Resposta) :-
 	SAIDA -> meta(Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
 */
 criaStringMeta(Login, Meta, Resposta) :-
+	term_to_atom(Meta, MetaAtomo),
 	string_concat(Login, ",", L), 							% Victor,
-	string_concat(L, Meta, StringLoginMeta),			 	% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
+	string_concat(L, MetaAtomo, StringLoginMeta),			 	% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
 	string_concat(StringLoginMeta, ").", StringFinal), 		% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
 	string_concat("meta(", StringFinal, Resposta).			% meta(Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
 
@@ -68,6 +69,14 @@ salvaUsuario(Usuario):-
 	write(Stream, "\n"),
 	close(Stream).
 
+% Salva uma meta no arquivo .txt
+salvaMeta(Meta) :-
+	open('dados/metas.txt',append,Stream),
+	write(Stream, Meta),
+	write(Stream, "\n"),
+	close(Stream).	
+
+%Salva uma lista de usuarios no .txt
 salva([]).
 salva([H|T]) :-
 	(compound(H) -> 
@@ -136,24 +145,12 @@ getUsuario(Login, [H|T], R) :-
 
 criaConta(NomeConta, Codigo, Saldo, Tipo, Descricao, C) :- C = [[NomeConta, Codigo, Saldo, Tipo, Descricao]].
 
-
-
-salvaMeta(MetaString) :-
-	open('dados/metas.txt', append, Stream),
-	write(Stream, MetaString),
-	write(Stream, "\n"),
-	close(Stream).
-
 criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, M) :- M = [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira].
 
-calculaMeses(_, _, R) :- R = 0.
-
-% cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira) :-
-% 	(ValorAlcancar <= ValorPraGuardar -> write('Você ja possui o valor a ser alcancado!')),!,
-% 	CalculaMeses(ValorAlcancar, ValorPraGuardar, Meses), write("A meta sera alcancada em "), write(Meses), write("meses!"),
-% 	criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, Meta),
-% 	criaStringMeta(Login, Meta, MetaString),
-% 	append(MetaString).
+cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira) :-
+	criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, Meta),
+	criaStringMeta(Login, Meta, MetaString),
+	salvaMeta(MetaString).
 
 listarContasUsuario(Usuario, R) :-
 	getContas(Usuario, Contas),
@@ -232,7 +229,73 @@ realizaTransacao(Login, ValorTransacao, CodigoOrigem, CodigoDestino) :-
 			append([UserFinal], UsuariosSemEndFile, UsuariosFinais),
 			delete_file('dados/usuarios.txt'),
 			salva(UsuariosFinais),
-			write("Transferencia efetuada com sucesso!")); 
+			write("Transferencia efetuada com sucesso!"),
+			salvaTransacao(Login, "TRANSFERENCIA", CodigoOrigem, CodigoDestino, ValorTransacao)); 
 			write("Conta de Origem ou Destino inválida, tente novamente!"),nl).
 
 
+criaTransferencia(Login, Tipo, CodigoContaOrigem, CodigoContaDestino, ValorTransacao, Resposta) :-
+	string_concat("transacao(", Login, S),
+	string_concat(S, "," ,Str),
+	string_concat(Str, Tipo, S0),
+	string_concat(S0, ",", S1),
+	string_concat(S1, CodigoContaOrigem, S2),
+	string_concat(S2, ",", S3),
+	string_concat(S3, CodigoContaDestino, S4),
+	string_concat(S4, ",", S5),
+	string_concat(S5, ValorTransacao, S6),
+	string_concat(S6, ").", R),
+	string_to_atom(R, Resposta).
+
+salvaTransacao(Login, Tipo, CodigoOrigem, CodigoDestino, ValorTransacao):-
+	criaTransferencia(Login, Tipo, CodigoOrigem, CodigoDestino, ValorTransacao, Transacao),
+	open('dados/transferencias.txt',append,Stream),
+	write(Stream, Transacao),
+	write(Stream, "\n"),
+	close(Stream).
+	
+criaDeposito(Login, Tipo, CodigoConta, ValorDeposito, Resposta) :-
+	string_concat("transacao(", Login, S),
+	string_concat(S, "," ,Str),
+	string_concat(Str, Tipo, S0),
+	string_concat(S0, ",", S1),
+	string_concat(S1, CodigoConta, S2),
+	string_concat(S2, ",", S3),
+	string_concat(S3, ValorDeposito, S4),
+	string_concat(S4, ").", R),
+	string_to_atom(R, Resposta).
+
+salvaDeposito(Login, Tipo, Codigo,ValorDeposito):-
+	criaDeposito(Login, Tipo, Codigo, ValorDeposito, Transacao),
+	open('dados/transferencias.txt',append,Stream),
+	write(Stream, Transacao),
+	write(Stream, "\n"),
+	close(Stream).
+
+
+depositar(Login, CodigoConta, ValorDeposito) :-
+	leUsuarios(Usuarios),
+	getUsuario(Login, Usuarios, User),
+	getSenha(User, Senha),
+	getContas(User, ContasUser),
+
+	(existeConta(ContasUser, CodigoConta) -> 
+		getContaPeloCodigo(ContasUser, CodigoConta, Conta),
+		getSaldoConta(Conta, Saldo),
+
+		getNomeConta(Conta, NomeConta),
+		getTipoConta(Conta, Tipo),
+		getDescricao(Conta, Descricao),
+		Saldo2 is Saldo + ValorDeposito,
+		ContaNova = [NomeConta, CodigoConta, Saldo2, Tipo, Descricao],
+		delete(ContasUser, Conta, ContasNovo),
+		append(ContasNovo, [ContaNova], ContasUsuario),
+		criaUserComContas(Login, Senha, ContasUsuario, UserFinal),
+		delete(Usuarios, User, UsuariosNovos),
+		delete(UsuariosNovos, end_of_file,UsuariosSemEndFile),
+		append([UserFinal], UsuariosSemEndFile, UsuariosFinais),
+		delete_file('dados/usuarios.txt'),
+		salva(UsuariosFinais),
+		write("Depósito realizado com sucesso!"),
+		salvaDeposito(Login, "DEPÓSITO", CodigoConta, ValorDeposito);
+		write("Conta inválida, tente novamente!")).

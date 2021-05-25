@@ -157,7 +157,8 @@ opcoesUsuario(Login, 7):-
 	write("\nDigite o código da conta que você vai fazer o deposito: "),
 	lerEntrada(CodigoConta),
 	write("Digite o valor a ser depositado: "),
-	lerEntrada(ValorDeposito).
+	lerEntrada(ValorDeposito),
+	depositar(Login, CodigoConta, ValorDeposito), nl, menuUsuario(Login).
 
 	%FALTA IMPLEMENTAR
 	%depositar(Login, CodigoConta, ValorDeposito), nl, halt.

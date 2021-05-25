@@ -1,4 +1,5 @@
-usuario(nicolas,123456,[["Bradesco","04",1405,"Corrente","vermelhinho do amor"],["Nubank","1",190,"Corrente","Roxinho"],["Nubank2","02",1005,"Poupanca","Nadanada"]]).
+usuario(nicolas,123456,[["Nubank","1",620,"Corrente","Roxinho"],["Nubank2","02",1800,"Poupanca","Nadanada"],["Bradesco","04",300,"Corrente","vermelhinho do amor"]]).
+usuario(pedro,123456,[["Caixa","1",11990000,"Poupanca","Azul do vigor"],["Inter","2",10000,"Corrente","Nada"]]).
 usuario(joao,123456,[["InterSa","01",120000,"Corrente","Laranjinha"],["Bradesco","02",0,"Poupanca","Vermelhinho"]]).
 usuario(henrique,123456,[["BB","01",12000,"Corrente","Amarelinho da paixao"],["Nubank","02",1301203,"Corrente","nada"]]).
 usuario(raphael,123456,[]).
