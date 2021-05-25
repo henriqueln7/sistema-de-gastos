@@ -129,6 +129,7 @@ getSenha(usuario(_,Senha,_), Senha).
 getContas(usuario(_,_,Contas), Contas).
 
 
+
 getUsuario(_, [], _):- false.
 getUsuario(Login, [H|T], R) :- 
 	getLogin(H, L), atom_string(L, StringLogin), 
@@ -194,6 +195,8 @@ existeConta([H|T], CodigoConta) :-
 	Codigo == CodigoConta;
 	existeConta(T, CodigoConta).
 
+
+%TRANSAÇÃO ENTRE CONTAS
 realizaTransacao(Login, ValorTransacao, CodigoOrigem, CodigoDestino) :-
 	leUsuarios(Usuarios),
 	getUsuario(Login, Usuarios, User),
@@ -235,9 +238,10 @@ realizaTransacao(Login, ValorTransacao, CodigoOrigem, CodigoDestino) :-
 
 
 criaTransferencia(Login, Tipo, CodigoContaOrigem, CodigoContaDestino, ValorTransacao, Resposta) :-
+	transformaStringParaSalvar(Tipo, Tipo2),
 	string_concat("transacao(", Login, S),
 	string_concat(S, "," ,Str),
-	string_concat(Str, Tipo, S0),
+	string_concat(Str, Tipo2, S0),
 	string_concat(S0, ",", S1),
 	string_concat(S1, CodigoContaOrigem, S2),
 	string_concat(S2, ",", S3),
@@ -253,26 +257,15 @@ salvaTransacao(Login, Tipo, CodigoOrigem, CodigoDestino, ValorTransacao):-
 	write(Stream, Transacao),
 	write(Stream, "\n"),
 	close(Stream).
-	
-criaDeposito(Login, Tipo, CodigoConta, ValorDeposito, Resposta) :-
-	string_concat("transacao(", Login, S),
-	string_concat(S, "," ,Str),
-	string_concat(Str, Tipo, S0),
-	string_concat(S0, ",", S1),
-	string_concat(S1, CodigoConta, S2),
-	string_concat(S2, ",", S3),
-	string_concat(S3, ValorDeposito, S4),
-	string_concat(S4, ").", R),
-	string_to_atom(R, Resposta).
-
-salvaDeposito(Login, Tipo, Codigo,ValorDeposito):-
-	criaDeposito(Login, Tipo, Codigo, ValorDeposito, Transacao),
-	open('dados/transferencias.txt',append,Stream),
-	write(Stream, Transacao),
-	write(Stream, "\n"),
-	close(Stream).
 
 
+transformaStringParaSalvar(String, R):-
+	string_concat("""", String, S1),
+	string_concat(S1, """", R).
+
+%DEPOSITO
+
+%Quando for depósito, a conta destino é -1, e o tipo é DEPOSITO
 depositar(Login, CodigoConta, ValorDeposito) :-
 	leUsuarios(Usuarios),
 	getUsuario(Login, Usuarios, User),
@@ -297,5 +290,38 @@ depositar(Login, CodigoConta, ValorDeposito) :-
 		delete_file('dados/usuarios.txt'),
 		salva(UsuariosFinais),
 		write("Depósito realizado com sucesso!"),
-		salvaDeposito(Login, "DEPÓSITO", CodigoConta, ValorDeposito);
+		salvaTransacao(Login, "DEPOSITO", CodigoConta, "-1", ValorDeposito);
 		write("Conta inválida, tente novamente!")).
+
+%EXTRATO
+getLoginTransacao(transacao(Login,_,_,_,_), Login).
+getTipoTransacao(transacao(_,Tipo,_,_,_), Tipo).
+getCodigoOrigemTransacao(transacao(_,_,CodigoOrigem,_,_), CodigoOrigem).
+getCodigoOrigemTransacao(transacao(_,_,_,CodigoDestino,_), CodigoDestino).
+getValorTransacao(transacao(_,_,_,_,Valor), Valor).
+
+leTransferencias(R):-
+	open('dados/transferencias.txt',read,Str),
+	read_transferencias(Str,Transferencias),
+	close(Str),
+	R = Transferencias.
+
+read_transferencias(Stream,[]):-
+	at_end_of_stream(Stream).
+
+read_transferencias(Stream,[X|L]):-
+	\+  at_end_of_stream(Stream),
+	read(Stream,X),
+	read_transferencias(Stream,L).
+
+
+% geraExtrato(Login) :-
+	
+% pegaTransacoes(_,[],Transacoes) :- Transacoes.
+% pegaTransacoes(Login,[H|T],Transacoes) :-
+% 	getLoginTransacao(H, L),
+% 	atom_string(L, StringLogin),
+% 	(StringLogin == Login -> append([H],Transacoes, Transacoes2), pegaTransacoes(Login, T, Transacoes2);
+		% pegaTransacoes(Login, T, Transacoes)).
+
+

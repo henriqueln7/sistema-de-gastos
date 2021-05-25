@@ -142,7 +142,8 @@ opcoesUsuario(Login, 3):-
 	cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira), nl, halt.
 
 opcoesUsuario(Login, 4):- write("NOT YET IMPLEMENTED!").
-opcoesUsuario(Login, 5):- write("NOT YET IMPLEMENTED!").
+
+opcoesUsuario(Login, 5):- geraExtrato(Login), nl, menuUsuario(Login).
 
 opcoesUsuario(Login, 6):- 
 	write("\nDigite o valor da transação: "),
