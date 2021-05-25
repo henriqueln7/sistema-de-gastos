@@ -12,7 +12,7 @@ criaStringUser(Login, Senha, Resposta) :-
 	string_concat("usuario(", StringFinal, R4),
 	string_concat(R4, ".", Resposta).
 
-criaStringUserComContas(Login, Senha, Conta, Resposta) :- 
+criaUserComContas(Login, Senha, Conta, Resposta) :- 
 	string_concat(Login, ",", R), 
 	string_concat(R, Senha, StringLoginSenha), 
 	string_concat(StringLoginSenha, ",", StringLoginSenha2),
@@ -20,7 +20,9 @@ criaStringUserComContas(Login, Senha, Conta, Resposta) :-
 	atom_string(ContasAtomo, C),
 	string_concat(StringLoginSenha2, C, StringLoginSenhaContas),
 	string_concat(StringLoginSenhaContas, ")", R4),
-	string_concat("usuario(", R4, Resposta).
+	string_concat("usuario(", R4, R5),
+	atom_string(Resp, R5),
+	Resposta = Resp.
 
 /*
 	ENTRADA -> Victor [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
@@ -66,15 +68,25 @@ salvaUsuario(Usuario):-
 	write(Stream, "\n"),
 	close(Stream).
 
+salva([]).
+salva([H|T]) :-
+	(compound(H) -> 
+		term_to_atom(H, User),
+		atom_string(User, StringUser),
+		string_concat(StringUser, ".", StringFinal),
+		string_to_atom(StringFinal, UserFinal),
+		salvaUsuario(UserFinal),
+		salva(T); 
+		
+			atom_string(H, StringUser),
+			string_concat(StringUser, ".", StringFinal),
+			string_to_atom(StringFinal, UserFinal),
+			salvaUsuario(UserFinal),
+			salva(T)).
+
 
 %Quase completo, tá dando um errinho que ainda n consegui ajeitar
-salvaTodosUsuarios([]).
-salvaTodosUsuarios([H|T]) :- 
-	term_to_atom(H, User),
-	atom_string(User, Usuario),
-	string_concat(Usuario, ".", U),
-	salvaUsuario(U),
-	salvaTodosUsuarios(T).
+
 
 %Lê os dados do arquivo usuarios.txt e retorna os usuarios na Lista R passada como parâmetro
 leUsuarios(R):-
@@ -130,9 +142,12 @@ adicionaConta(Login, NomeConta, Codigo, Saldo, TipoConta, Descricao, UsuarioFina
 	getUsuario(Login, Usuarios, User),
 	getContas(User, C),
 	getSenha(User, Senha),
-	atom_string(Senha, S),
 	append(C, Conta, ContasUser),
-	criaStringUserComContas(Login, S, ContasUser, UsuarioFinal).
+	criaUserComContas(Login, S, ContasUser, UsuarioFinal).
+
+
+
+
 
 salvaMeta(MetaString) :-
 	open('dados/metas.txt', append, Stream),
@@ -142,10 +157,10 @@ salvaMeta(MetaString) :-
 
 criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, M) :- M = [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira].
 
-CalculaMeses(_, _, R):- R = 0.
+calculaMeses(_, _, R) :- R = 0.
 
 cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira) :-
-	(ValorAlcancar <= ValorPraGuardar -> write('Você ja possui o valor a ser alcancado!'))!,
+	(ValorAlcancar <= ValorPraGuardar -> write('Você ja possui o valor a ser alcancado!')),!,
 	CalculaMeses(ValorAlcancar, ValorPraGuardar, Meses), write("A meta sera alcancada em "), write(Meses), write("meses!"),
 	criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, Meta),
 	criaStringMeta(Login, Meta, MetaString),
