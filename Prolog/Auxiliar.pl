@@ -293,6 +293,36 @@ depositar(Login, CodigoConta, ValorDeposito) :-
 		salvaTransacao(Login, "DEPOSITO", CodigoConta, "-1", ValorDeposito);
 		write("Conta inválida, tente novamente!")).
 
+%SAQUE ===NÃO TESTADO===
+
+%Quando for sacar, a conta destino é -2 e o tipo é SAQUE
+sacar(Login, CodigoConta, ValorSaque) :-
+	leUsuarios(Usuarios),
+	getUsuario(Login, Usuarios, User),
+	getSenha(User, Senha),
+	getContas(User, ContasUser),
+
+	(existeConta(ContasUser, CodigoConta) -> 
+		getContaPeloCodigo(ContasUser, CodigoConta, Conta),
+		getSaldoConta(Conta, Saldo),
+		getNomeConta(Conta, NomeConta),
+		getTipoConta(Conta, Tipo),
+		getDescricao(Conta, Descricao),
+		(ValorSaque > Saldo -> write("Saldo insuficiente!");
+			Saldo2 is Saldo - ValorSaque,
+			ContaNova = [NomeConta, CodigoConta, Saldo2, Tipo, Descricao],
+			delete(ContasUser, Conta, ContasNovo),
+			append(ContasNovo, [ContaNova], ContasUsuario),
+			criaUserComContas(Login, Senha, ContasUsuario, UserFinal),
+			delete(Usuarios, User, UsuariosNovos),
+			delete(UsuariosNovos, end_of_file,UsuariosSemEndFile),
+			append([UserFinal], UsuariosSemEndFile, UsuariosFinais),
+			delete_file('dados/usuarios.txt'),
+			salva(UsuariosFinais),
+			write("Saque realizado com sucesso!"),
+			salvaTransacao(Login, "SAQUE", CodigoConta, "-2", ValorSaque);
+			write("Conta inválida, tente novamente!")).
+
 %EXTRATO
 getLoginTransacao(transacao(Login,_,_,_,_), Login).
 getTipoTransacao(transacao(_,Tipo,_,_,_), Tipo).
