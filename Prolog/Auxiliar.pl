@@ -321,7 +321,7 @@ sacar(Login, CodigoConta, ValorSaque) :-
 			salva(UsuariosFinais),
 			write("Saque realizado com sucesso!"),
 			salvaTransacao(Login, "SAQUE", CodigoConta, "-2", ValorSaque);
-			write("Conta inválida, tente novamente!")).
+			write("Conta inválida, tente novamente!"))).
 
 %EXTRATO
 getLoginTransacao(transacao(Login,_,_,_,_), Login).
