@@ -136,17 +136,6 @@ getUsuario(Login, [H|T], R) :-
 
 criaConta(NomeConta, Codigo, Saldo, Tipo, Descricao, C) :- C = [[NomeConta, Codigo, Saldo, Tipo, Descricao]].
 
-adicionaConta(Login, NomeConta, Codigo, Saldo, TipoConta, Descricao, UsuarioFinal) :-
-	criaConta(NomeConta, Codigo, Saldo, TipoConta, Descricao, Conta),
-	leUsuarios(Usuarios),
-	getUsuario(Login, Usuarios, User),
-	getContas(User, C),
-	getSenha(User, Senha),
-	append(C, Conta, ContasUser),
-	criaUserComContas(Login, S, ContasUser, UsuarioFinal).
-
-
-
 
 
 salvaMeta(MetaString) :-
