@@ -304,7 +304,8 @@ leTransferencias(R):-
 	open('dados/transferencias.txt',read,Str),
 	read_transferencias(Str,Transferencias),
 	close(Str),
-	R = Transferencias.
+	delete(Transferencias, end_of_file, NewTransferencias),
+	R = NewTransferencias.
 
 read_transferencias(Stream,[]):-
 	at_end_of_stream(Stream).
@@ -315,13 +316,34 @@ read_transferencias(Stream,[X|L]):-
 	read_transferencias(Stream,L).
 
 
-% geraExtrato(Login) :-
-	
-% pegaTransacoes(_,[],Transacoes) :- Transacoes.
-% pegaTransacoes(Login,[H|T],Transacoes) :-
-% 	getLoginTransacao(H, L),
-% 	atom_string(L, StringLogin),
-% 	(StringLogin == Login -> append([H],Transacoes, Transacoes2), pegaTransacoes(Login, T, Transacoes2);
-		% pegaTransacoes(Login, T, Transacoes)).
+geraExtrato(Login) :- 
+	leTransferencias(Transferencias),
+	pegaTransacoes(Login, Transferencias,[], Resposta),
+	criaStringTransferencias(Resposta).
+
+pegaTransacoes(_, [], ListaIntermediaria, Resposta) :- Resposta = ListaIntermediaria.
+pegaTransacoes(Login,[H|T],ListaIntermediaria, Resposta) :-
+	getLoginTransacao(H, L),
+	atom_string(L, StringLogin),
+	(Login == StringLogin -> inserir_final(ListaIntermediaria, H, Lista), pegaTransacoes(Login, T, Lista, Resposta);
+		pegaTransacoes(Login, T, ListaIntermediaria,Resposta)).
 
 
+inserir_final([], Y, [Y]).         % Se a lista estava vazia, o resultado é [Y]
+inserir_final([I|R], Y, [I|R1]) :- % Senão, o primeiro elemento é igual, e o resto é obtido
+    inserir_final(R, Y, R1). 
+
+criaStringTransferencias([]).
+criaStringTransferencias([H|T]) :-
+	getTipoTransacao(H, Tipo),
+	getCodigoOrigemTransacao(H, CodigoOrigem),
+	getCodigoOrigemTransacao(H, CodigoDestino),
+	getValorTransacao(H, Valor),
+	nl,write("Tipo de transação: "), write(Tipo), nl,
+	(Tipo == "TRANSFERENCIA" -> 
+		write("Código da conta de origem: "), write(CodigoOrigem),nl,
+		write("Código da conta de destino: "), write(CodigoDestino), nl, 
+		write("Valor da Transferência: "), write(Valor),nl,nl;
+		write("Código da conta: "), write(CodigoOrigem),nl,
+		write("Valor do Depósito: "), write(Valor),nl,nl),
+	criaStringTransferencias(T).

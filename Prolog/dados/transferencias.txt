@@ -1,4 +1,4 @@
 transacao(nicolas,"TRANSFERENCIA",02,04,200).
-transacao(nicolas,"TRANSFERENCIA",02,04,200).
+transacao(nicolas,"TRANSFERENCIA",02,04,150).
 transacao(nicolas,"DEPOSITO",04,-1,20).
 transacao(henrique,"DEPOSITO",01,-1,20).

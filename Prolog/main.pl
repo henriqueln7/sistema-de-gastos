@@ -143,7 +143,7 @@ opcoesUsuario(Login, 3):-
 
 opcoesUsuario(Login, 4):- write("NOT YET IMPLEMENTED!").
 
-opcoesUsuario(Login, 5):- geraExtrato(Login), nl, menuUsuario(Login).
+opcoesUsuario(Login, 5):- write("--------#EXTRATO de "), write(Login), write("#--------"), nl,geraExtrato(Login), menuUsuario(Login).
 
 opcoesUsuario(Login, 6):- 
 	write("\nDigite o valor da transação: "),
