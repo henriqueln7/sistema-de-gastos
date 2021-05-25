@@ -116,10 +116,19 @@ opcoesUsuario(Login, 1) :-
 	delete(UsuariosNovos, end_of_file,UsuariosSemEndFile),
 	append([UsuarioComContas], UsuariosSemEndFile, UsuariosFinais),
 	delete_file('dados/usuarios.txt'),
-	salva(UsuariosFinais).
+	salva(UsuariosFinais),
+	nl, write("Conta cadastrada com sucesso"),nl,
+	menuUsuario(Login).
 	
 
-opcoesUsuario(Login, 2) :- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 2) :- 
+	leUsuarios(Usuarios),
+	getUsuario(Login, Usuarios, User),
+	getContas(User, C),
+	(C == [] -> nl,write("Você não possui contas, cadastre alguma para verificá-las"), menuUsuario(Login);
+	nl,write("Aqui estão suas contas, use-as com cuidado!"),nl,
+	listarContas(C),
+	menuUsuario(Login)).
 
 opcoesUsuario(Login, 3):-
 	write("\nDescricao da meta: "),

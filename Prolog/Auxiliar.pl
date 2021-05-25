@@ -160,22 +160,34 @@ listarContasUsuario(Usuario, R) :-
 	listarContas(Contas, R).
 
 
-listarContas([], R).
-listarContas([H|T], R) :-
-	listarContas(T, R1),
-	getNomeConta(H,Nome),
-	R is Nome + R1.
+listarContas([]).
+listarContas([H|T]) :- 
+	getNomeConta(H, Nome),
+	getCodigoConta(H, Codigo),
+	getSaldoConta(H, Saldo),
+	getTipoConta(H, Tipo),
+	getDescricao(H, Descricao),
+	criaStringConta(Nome, Codigo, Saldo, Tipo, Descricao), nl,
+	listarContas(T).
+	
 
 
-getNomeConta([H|T], Nome) :- encontraeElem(0, [H|T], Nome).
-getCodigoConta([H|T], Codigo) :- encontraeElem(1, [H|T], Codigo).
-getSaldoConta([H|T], Saldo) :- encontraeElem(2, [H|T], Saldo).
-getTipoConta([H|T], Tipo) :- encontraeElem(3, [H|T], Tipo).
-getDescricao([H|T], Descricao) :- encontraeElem(4, [H|T], Descricao).
+getNomeConta(Lista, Nome) :- nth0(0, Lista, Nome).
+getCodigoConta(Lista, Codigo) :- nth0(1, Lista, Codigo).
+getSaldoConta(Lista, Saldo) :- nth0(2, Lista, Saldo).
+getTipoConta(Lista, Tipo) :- nth0(3, Lista, Tipo).
+getDescricao(Lista, Descricao) :- nth0(4, Lista, Descricao).
+
+criaStringConta(Nome, Codigo, Saldo, Tipo, Descricao) :-
+	write("Nome da conta: "), write(Nome),nl,
+	write("Código da conta: "), write(Codigo),nl,
+	write("Saldo: "), write(Saldo),nl,
+	write("Tipo da conta: "), write(Tipo),nl,
+	write("Descricao da conta: "), write(Descricao),nl.
 
 
-encontraeElem(0, [H|_], H):- !.
-encontraeElem(I, [_|T], E):- X is I - 1, encontraeElem(X, T, E).
+
+
 
 
 
