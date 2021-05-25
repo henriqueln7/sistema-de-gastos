@@ -148,12 +148,12 @@ criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, M) :- M = [Des
 
 calculaMeses(_, _, R) :- R = 0.
 
-cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira) :-
-	(ValorAlcancar <= ValorPraGuardar -> write('Você ja possui o valor a ser alcancado!')),!,
-	CalculaMeses(ValorAlcancar, ValorPraGuardar, Meses), write("A meta sera alcancada em "), write(Meses), write("meses!"),
-	criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, Meta),
-	criaStringMeta(Login, Meta, MetaString),
-	append(MetaString).
+% cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira) :-
+% 	(ValorAlcancar <= ValorPraGuardar -> write('Você ja possui o valor a ser alcancado!')),!,
+% 	CalculaMeses(ValorAlcancar, ValorPraGuardar, Meses), write("A meta sera alcancada em "), write(Meses), write("meses!"),
+% 	criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, Meta),
+% 	criaStringMeta(Login, Meta, MetaString),
+% 	append(MetaString).
 
 listarContasUsuario(Usuario, R) :-
 	getContas(Usuario, Contas),
@@ -171,12 +171,12 @@ listarContas([H|T]) :-
 	listarContas(T).
 	
 
-
-getNomeConta(Lista, Nome) :- nth0(0, Lista, Nome).
-getCodigoConta(Lista, Codigo) :- nth0(1, Lista, Codigo).
-getSaldoConta(Lista, Saldo) :- nth0(2, Lista, Saldo).
-getTipoConta(Lista, Tipo) :- nth0(3, Lista, Tipo).
-getDescricao(Lista, Descricao) :- nth0(4, Lista, Descricao).
+%Cada Conta é uma lista que contem Nome, Codigo, Saldo, Tipo e Descricao
+getNomeConta(Conta, Nome) :- nth0(0, Conta, Nome).
+getCodigoConta(Conta, Codigo) :- nth0(1, Conta, Codigo).
+getSaldoConta(Conta, Saldo) :- nth0(2, Conta, Saldo).
+getTipoConta(Conta, Tipo) :- nth0(3, Conta, Tipo).
+getDescricao(Conta, Descricao) :- nth0(4, Conta, Descricao).
 
 criaStringConta(Nome, Codigo, Saldo, Tipo, Descricao) :-
 	write("Nome da conta: "), write(Nome),nl,
@@ -186,8 +186,53 @@ criaStringConta(Nome, Codigo, Saldo, Tipo, Descricao) :-
 	write("Descricao da conta: "), write(Descricao),nl.
 
 
+%Recebe a lista de contas do usuário e vai retornar a conta com o código requerido
+getContaPeloCodigo([H|T], CodigoConta, Conta) :-
+	getCodigoConta(H, Codigo),
+	(Codigo == CodigoConta -> Conta = H;
+		getContaPeloCodigo(T, CodigoConta, Conta)).
 
+existeConta([H|T], CodigoConta) :-
+	getCodigoConta(H, Codigo),
+	Codigo == CodigoConta;
+	existeConta(T, CodigoConta).
 
+realizaTransacao(Login, ValorTransacao, CodigoOrigem, CodigoDestino) :-
+	leUsuarios(Usuarios),
+	getUsuario(Login, Usuarios, User),
+	getSenha(User, Senha),
+	getContas(User, ContasUser),
+	
+	(existeConta(ContasUser, CodigoOrigem), existeConta(ContasUser, CodigoDestino) ->
+		getContaPeloCodigo(ContasUser, CodigoOrigem, ContaOrigem),
+		getNomeConta(ContaOrigem, NomeContaOrigem),
+		getTipoConta(ContaOrigem, TipoOrigem),
+		getDescricao(ContaOrigem, DescricaoOrigem),
 
+		getContaPeloCodigo(ContasUser, CodigoDestino, ContaDestino),
+		getNomeConta(ContaDestino, NomeContaDestino),
+		getTipoConta(ContaDestino, TipoDestino),
+		getDescricao(ContaDestino, DescricaoDestino),
+
+		getSaldoConta(ContaOrigem, SaldoOrigem),
+		getSaldoConta(ContaDestino, SaldoDestino),
+
+		delete(ContasUser, ContaOrigem, ContasUserSemContaOrigem),
+		delete(ContasUserSemContaOrigem, ContaDestino, ContasUserSemContaDestinoEOrigem),
+		(ValorTransacao > SaldoOrigem -> write("Saldo insuficiente!");
+			SaldoOrigem2 is SaldoOrigem - ValorTransacao, 
+			SaldoDestino2 is SaldoDestino + ValorTransacao,
+			ContaOrigemNova = [NomeContaOrigem, CodigoOrigem, SaldoOrigem2, TipoOrigem, DescricaoOrigem],
+			ContaDestinoNova = [NomeContaDestino, CodigoDestino, SaldoDestino2, TipoDestino, DescricaoDestino],
+			append([ContaOrigemNova], [ContaDestinoNova], ContasUserIntermediario),
+			append(ContasUserSemContaDestinoEOrigem, ContasUserIntermediario, ContasUsuario),
+			criaUserComContas(Login, Senha, ContasUsuario, UserFinal),
+			delete(Usuarios, User, UsuariosNovos),
+			delete(UsuariosNovos, end_of_file,UsuariosSemEndFile),
+			append([UserFinal], UsuariosSemEndFile, UsuariosFinais),
+			delete_file('dados/usuarios.txt'),
+			salva(UsuariosFinais),
+			write("Transferencia efetuada com sucesso!")); 
+			write("Conta de Origem ou Destino inválida, tente novamente!"),nl).
 
 

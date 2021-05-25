@@ -146,14 +146,12 @@ opcoesUsuario(Login, 5):- write("NOT YET IMPLEMENTED!").
 
 opcoesUsuario(Login, 6):- 
 	write("\nDigite o valor da transação: "),
-	lerEntrada(ValorTransacao),
+	lerNumero(ValorTransacao),
 	write("Código da conta de origem: "),
 	lerEntrada(CodigoContaOrigem),
 	write("Código da conta de destino: "),
-	lerEntrada(CodigoContaDestino).
-	
-	%FALTA IMPLEMENTAR
-	%realizarTransacao(Login, ValorTransacao, CodigoContaOrigem, CodigoContaDestino), nl, halt.
+	lerEntrada(CodigoContaDestino),
+	realizaTransacao(Login, ValorTransacao, CodigoContaOrigem, CodigoContaDestino),nl,nl, menuUsuario(Login).
 
 opcoesUsuario(Login, 7):- 
 	write("\nDigite o código da conta que você vai fazer o deposito: "),
