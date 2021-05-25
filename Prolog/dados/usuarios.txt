@@ -1,1 +1,1 @@
-end_of_file.
+usuario(henriqueln,123456,[["Banco do Brasil","01",300,"Corrente","Amarelinho lindo"]]).

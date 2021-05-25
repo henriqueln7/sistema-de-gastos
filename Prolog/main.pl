@@ -38,8 +38,8 @@ menu("L") :-
 	lerEntrada(Login), 
 	write("Senha: "), 
 	lerEntrada(Senha), 
-	leUsuarios(L),
 	(validaUsuario(Login, Senha, L) -> write("Bem vindo "), write(Login), nl, menuUsuario(Login);
+	leUsuarios(L),
 		write("\nLogin ou senha incorretos, tente novamente.\n"),nl, menu("L")).
 
 %Tivemos alguns problemas com os caracteres especiais, ai decidimos tirar por enquanto
@@ -106,28 +106,61 @@ opcoesUsuario(Login, 1) :-
 	write("Descrição da Conta: "),
 	lerEntrada(Descricao),
 	leUsuarios(Usuarios),
-	getUsuario(Login, Usuarios, User),
+	getUsuario(Login, Usuarios, User), %Guarda em User o usuário que estava cadastrado no arquivo
 	adicionaConta(Login, NomeConta,Codigo, Saldo, TipoConta, Descricao, UsuarioFinal),
+	atom_string(U, UsuarioFinal),
 	delete(Usuarios, User, UsuariosNovo),
-	append([UsuarioFinal], UsuariosNovo, UsuariosFinais),
-	salvaTodosUsuarios(UsuariosFinais).
+	append([U], UsuariosNovo, UsuariosFinais),
+	delete(UsuariosFinais, end_of_file,R),
+	delete_file('dados/usuarios.txt'),
+	salvaTodosUsuarios(R),
+	write("Conta adicionada com sucesso"), menuUsuario(Login).
 
 opcoesUsuario(Login, 2) :- write("NOT YET IMPLEMENTED!").
-opcoesUsuario(Login, 3):- write("NOT YET IMPLEMENTED!").
+
+opcoesUsuario(Login, 3):-
+	write("\nDescricao da meta: "),
+	lerEntrada(DescricaoMeta),
+	write("Valor a ser alcancado: "),
+	lerEntrada(ValorAlcancar),
+	write("Quanto ira guardar por mes: "),
+	lerEntrada(ValorPraGuardar),
+	write("Quanto ja possui guardado: "),
+	lerEntrada(Carteira),
+	cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira), nl, halt.
+
 opcoesUsuario(Login, 4):- write("NOT YET IMPLEMENTED!").
 opcoesUsuario(Login, 5):- write("NOT YET IMPLEMENTED!").
-opcoesUsuario(Login, 6):- write("NOT YET IMPLEMENTED!").
-opcoesUsuario(Login, 7):- write("NOT YET IMPLEMENTED!").
-opcoesUsuario(Login, 8):- write("NOT YET IMPLEMENTED!").
+
+opcoesUsuario(Login, 6):- 
+	write("\nDigite o valor da transação: "),
+	lerEntrada(ValorTransacao),
+	write("Código da conta de origem: "),
+	lerEntrada(CodigoContaOrigem),
+	write("Código da conta de destino: "),
+	lerEntrada(CodigoContaDestino),
+	
+	%FALTA IMPLEMENTAR
+	%realizarTransacao(Login, ValorTransacao, CodigoContaOrigem, CodigoContaDestino), nl, halt.
+
+opcoesUsuario(Login, 7):- 
+	write("\nDigite o código da conta que você vai fazer o deposito: "),
+	lerEntrada(CodigoConta),
+	write("Digite o valor a ser depositado: "),
+	lerEntrada(ValorDeposito),
+
+	%FALTA IMPLEMENTAR
+	%depositar(Login, CodigoConta, ValorDeposito), nl, halt.
+
+opcoesUsuario(Login, 8):- 
+	write("\nDigite o código da conta que você vai fazer a retirada: "),
+	lerEntrada(CodigoConta),
+	write("Digite o valor a ser retirado: "),
+	lerEntrada(ValorSaque),
+
+	%FALTA IMPLEMENTAR
+	%sacar(Login, CodigoConta, ValorSaque), nl, halt.
+
 opcoesUsuario(Login, 9) :- write('Ate logo '), write(Login), menuInicial.
 opcoesUsuario(Login, _) :- write("Opção Inválida, tente novamente.", menuUsuario(Login)).
-
-
-
-
-
-
-
-
-
 

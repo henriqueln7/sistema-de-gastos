@@ -22,6 +22,15 @@ criaStringUserComContas(Login, Senha, Conta, Resposta) :-
 	string_concat(StringLoginSenhaContas, ")", R4),
 	string_concat("usuario(", R4, Resposta).
 
+/*
+	ENTRADA -> Victor [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
+	SAIDA -> meta(Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
+*/
+criaStringMeta(Login, Meta, Resposta) :-
+	string_concat(Login, ",", L), 							% Victor,
+	string_concat(L, Meta, StringLoginMeta),			 	% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
+	string_concat(StringLoginMeta, ").", StringFinal), 		% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
+	string_concat("meta(", StringFinal, Resposta).			% meta(Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
 
 %Regra responsável por validar a senha(Se está conforme o esperado, com tamanho e caracter especial)
 %Recebo a senha como uma lista já com cada "caracter" da senha(esses caracteres são átomos)
@@ -29,8 +38,8 @@ validaSenha(Senha) :- checaTamanho(Senha).
 checaTamanho(Senha) :- length(Senha, R), R > 5.
 checaCaracterEspecial([H|T]) :- member(H, [*, !, @, /, #]); checaCaracterEspecial(T).
 
-
 %Transforma a String criada no StringUser em um átomo
+	%leUsuarios(L),
 /*
 ENTRADA --- criaUserAtomo("usuario(nicolas, senha2, [])")
 SAIDA --- R = 'usuario(nicolas,senha2,[])'
@@ -52,7 +61,7 @@ validaUsuario(Login, Senha, [H|T]) :-
 
 %Salva o usuário no arquivo .txt
 salvaUsuario(Usuario):-
-	open('dados/usuarios.txt',append, Stream),
+	open('dados/usuarios.txt',append,Stream),
 	write(Stream, Usuario),
 	write(Stream, "\n"),
 	close(Stream).
@@ -61,11 +70,11 @@ salvaUsuario(Usuario):-
 %Quase completo, tá dando um errinho que ainda n consegui ajeitar
 salvaTodosUsuarios([]).
 salvaTodosUsuarios([H|T]) :- 
-	term_to_atom(H, Usuario),
-	atom_string(Usuario, User),
-	string_concat(User, ".", U),
-	(exists_file('dados/usuarios.txt') -> delete_file('dados/usuarios.txt'), 
-	salvaUsuario(U), salvaTodosUsuarios(T); salvaUsuario(U), salvaTodosUsuarios(T)).
+	term_to_atom(H, User),
+	atom_string(User, Usuario),
+	string_concat(Usuario, ".", U),
+	salvaUsuario(U),
+	salvaTodosUsuarios(T).
 
 %Lê os dados do arquivo usuarios.txt e retorna os usuarios na Lista R passada como parâmetro
 leUsuarios(R):-
@@ -124,3 +133,45 @@ adicionaConta(Login, NomeConta, Codigo, Saldo, TipoConta, Descricao, UsuarioFina
 	atom_string(Senha, S),
 	append(C, Conta, ContasUser),
 	criaStringUserComContas(Login, S, ContasUser, UsuarioFinal).
+
+salvaMeta(MetaString) :-
+	open('dados/metas.txt', append, Stream),
+	write(Stream, MetaString),
+	write(Stream, "\n"),
+	close(Stream).
+
+criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, M) :- M = [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira].
+
+CalculaMeses(_, _, R):- R = 0.
+
+cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira) :-
+	(ValorAlcancar <= ValorPraGuardar -> write('Você ja possui o valor a ser alcancado!'))!,
+	CalculaMeses(ValorAlcancar, ValorPraGuardar, Meses), write("A meta sera alcancada em "), write(Meses), write("meses!"),
+	criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, Meta),
+	criaStringMeta(Login, Meta, MetaString),
+	append(MetaString).
+
+listarContasUsuario(Usuario, R) :-
+	getContas(Usuario, Contas),
+	listarContas(Contas, R).
+
+
+listarContas([], R).
+listarContas([H|T], R) :-
+	listarContas(T, R1),
+	getNomeConta(H,Nome),
+	R is Nome + R1.
+
+
+getNomeConta([H|T], Nome) :- encontraeElem(0, [H|T], Nome).
+getCodigoConta([H|T], Codigo) :- encontraeElem(1, [H|T], Codigo).
+getSaldoConta([H|T], Saldo) :- encontraeElem(2, [H|T], Saldo).
+getTipoConta([H|T], Tipo) :- encontraeElem(3, [H|T], Tipo).
+getDescricao([H|T], Descricao) :- encontraeElem(4, [H|T], Descricao).
+
+
+encontraeElem(0, [H|_], H):- !.
+encontraeElem(I, [_|T], E):- X is I - 1, encontraeElem(X, T, E).
+
+
+
