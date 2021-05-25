@@ -1,7 +1,7 @@
+usuario(arthur,123456,[["Caixa Federal","01",1100,"Corrente","Nada"]]).
+usuario(nicolas,123456,[["Nubank2","02",1000,"Poupanca","Nadanada"],["Nubank","1",400,"Corrente","Roxinho"],["Bradesco","04",1200,"Corrente","vermelhinho do amor"]]).
 usuario(raphael,123456,[["Nome da Conta","1",220,"Corrente","Conta para nada"]]).
-usuario(arthur,123456,[["Caixa Federal","01",200,"Corrente","Nada"]]).
 usuario(henrique,123456,[["Nubank","02",1301203,"Corrente","nada"],["BB","01",12020,"Corrente","Amarelinho da paixao"]]).
-usuario(nicolas,123456,[["Nubank","1",620,"Corrente","Roxinho"],["Nubank2","02",1200,"Poupanca","Nadanada"],["Bradesco","04",1200,"Corrente","vermelhinho do amor"]]).
 usuario(pedro,123456,[["Caixa","1",11990000,"Poupanca","Azul do vigor"],["Inter","2",10000,"Corrente","Nada"]]).
 usuario(joao,123456,[["InterSa","01",120000,"Corrente","Laranjinha"],["Bradesco","02",0,"Poupanca","Vermelhinho"]]).
 usuario(nicolasmoreira,123456,[]).

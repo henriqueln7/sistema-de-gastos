@@ -289,7 +289,9 @@ depositar(Login, CodigoConta, ValorDeposito) :-
 		append([UserFinal], UsuariosSemEndFile, UsuariosFinais),
 		delete_file('dados/usuarios.txt'),
 		salva(UsuariosFinais),
-		write("Depósito realizado com sucesso!"),
+		write("-----------------------"),
+		nl,write("Depósito de R$ "), write(ValorDeposito), write(" realizado com sucesso!"),nl,
+		write("-----------------------"),
 		salvaTransacao(Login, "DEPOSITO", CodigoConta, "-1", ValorDeposito);
 		write("Conta inválida, tente novamente!")).
 
@@ -319,7 +321,9 @@ sacar(Login, CodigoConta, ValorSaque) :-
 			append([UserFinal], UsuariosSemEndFile, UsuariosFinais),
 			delete_file('dados/usuarios.txt'),
 			salva(UsuariosFinais),
-			write("Saque realizado com sucesso!"),
+			write("-----------------------"),
+			nl,write("Saque de R$ "), write(ValorSaque), write(" realizado com sucesso!"),nl,
+			write("-----------------------"),
 			salvaTransacao(Login, "SAQUE", CodigoConta, "-2", ValorSaque);
 			write("Conta inválida, tente novamente!"))).
 

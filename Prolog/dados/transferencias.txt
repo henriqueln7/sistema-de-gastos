@@ -3,3 +3,11 @@ transacao(nicolas,"TRANSFERENCIA",02,04,150).
 transacao(nicolas,"DEPOSITO",04,-1,20).
 transacao(henrique,"DEPOSITO",01,-1,20).
 transacao(raphael,"DEPOSITO",1,-1,20).
+transacao(nicolas,"SAQUE",1,-2,20).
+transacao(nicolas,"SAQUE",02,-2,200).
+transacao(nicolas,"SAQUE",1,-2,100).
+transacao(nicolas,"SAQUE",1,-2,100).
+transacao(nicolas,"SAQUE",04,-2,200).
+transacao(nicolas,"DEPOSITO",04,-1,200).
+transacao(arthur,"SAQUE",01,-2,100).
+transacao(arthur,"DEPOSITO",01,-1,1000).

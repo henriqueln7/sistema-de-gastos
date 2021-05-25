@@ -168,7 +168,8 @@ opcoesUsuario(Login, 8):-
 	write("\nDigite o código da conta que você vai fazer a retirada: "),
 	lerEntrada(CodigoConta),
 	write("Digite o valor a ser retirado: "),
-	lerEntrada(ValorSaque).
+	lerNumero(ValorSaque),
+	sacar(Login, CodigoConta, ValorSaque), nl, menuUsuario(Login).
 
 	%FALTA IMPLEMENTAR
 	%sacar(Login, CodigoConta, ValorSaque), nl, halt.
