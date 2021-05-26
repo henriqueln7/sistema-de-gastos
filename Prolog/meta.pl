@@ -10,17 +10,28 @@
 			   pegaMetasUser/4,
 			   exibirMetasUsuario/1,
 			   listaMetas/1,
-			   exibeMeta/4]).
+			   exibeMeta/4,
+			   calculaMeses/4]).
 
 :- use_module(persistencia).
 :- use_module(auxiliar).
 
 criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, M) :- M = [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira].
 
+calculaMeses(ValorAlcancar, ValorPraGuardar, Carteira, Meses2) :-
+	ValorAtual is ValorAlcancar - Carteira,
+	(ValorAtual =< 0 -> Meses2 is 0;
+		Meses is ValorAtual/ValorPraGuardar,
+		(Meses < 1 -> Meses2 is floor(Meses);
+			Meses2 is ceil(Meses))).
+
 cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira) :-
 	criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, Meta),
 	criaStringMeta(Login, Meta, MetaString),
-	salvaMeta(MetaString).
+	(calculaMeses(ValorAlcancar, ValorPraGuardar, Carteira, Meses), Meses =:= 0 -> write("Você já possui o dinheiro!");
+	salvaMeta(MetaString)).
+	
+	
 
 /*
 	ENTRADA -> Victor [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
@@ -70,10 +81,12 @@ listaMetas([H|T]):-
 	getCarteiraMeta(Valores, Carteira),
 	exibeMeta(Descricao, ValorAlcancar, ValorGuardar, Carteira),nl,
 	listaMetas(T).
-
+% VALOR ALCANCAR - VALOR ATUAL / CARTEIRA
 %Forma que as metas seão exibidas
 exibeMeta(Descricao, ValorAlcancar, ValorGuardar, Carteira) :-
 	write("Descricao da meta: "), write(Descricao),nl,
 	write("Valor a ser alcançado: "), write(ValorAlcancar),nl,
 	write("Aporte mensal: "), write(ValorGuardar),nl,
-	write("Quanto você já tem guardado: "), write(Carteira),nl.
+	write("Quanto você já tem guardado: "), write(Carteira),nl,
+	calculaMeses(ValorAlcancar, ValorGuardar, Carteira, Meses),
+	write("Você atingirá a meta em "), write(Meses), write(" meses!"),nl.

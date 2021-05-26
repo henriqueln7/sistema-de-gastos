@@ -1,1 +1,1 @@
-meta(nicolas,["Comprar uma casa",12000,120,10]).
+
