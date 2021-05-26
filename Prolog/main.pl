@@ -125,8 +125,8 @@ opcoesUsuario(Login, 2) :-
 	leUsuarios(Usuarios),
 	getUsuario(Login, Usuarios, User),
 	getContas(User, C),
-	(C == [] -> nl,write("Você não possui contas, cadastre alguma para verificá-las"), menuUsuario(Login);
-	nl,write("Aqui estão suas contas, use-as com cuidado!"),nl,
+	nl,write("---------#CONTAS#---------"),nl,
+	(C == [] -> nl,write("*Você não possui contas!"),nl, menuUsuario(Login);
 	listarContas(C),
 	menuUsuario(Login)).
 
@@ -134,16 +134,16 @@ opcoesUsuario(Login, 3):-
 	write("\nDescricao da meta: "),
 	lerEntrada(DescricaoMeta),
 	write("Valor a ser alcancado: "),
-	lerEntrada(ValorAlcancar),
+	lerNumero(ValorAlcancar),
 	write("Quanto ira guardar por mes: "),
-	lerEntrada(ValorPraGuardar),
+	lerNumero(ValorPraGuardar),
 	write("Quanto ja possui guardado: "),
-	lerEntrada(Carteira),
-	cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira), nl, halt.
+	lerNumero(Carteira),
+	cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira), nl, menuUsuario(Login).
 
-opcoesUsuario(Login, 4):- write("NOT YET IMPLEMENTED!").
+opcoesUsuario(Login, 4):- exibirMetasUsuario(Login),menuUsuario(Login).
 
-opcoesUsuario(Login, 5):- write("--------#EXTRATO de "), write(Login), write("#--------"), nl,geraExtrato(Login), menuUsuario(Login).
+opcoesUsuario(Login, 5):- nl,write("--------#EXTRATO de "), write(Login), write("#--------"), nl,geraExtrato(Login), menuUsuario(Login).
 
 opcoesUsuario(Login, 6):- 
 	write("\nDigite o valor da transação: "),

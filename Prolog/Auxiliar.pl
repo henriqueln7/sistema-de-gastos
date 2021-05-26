@@ -24,16 +24,6 @@ criaUserComContas(Login, Senha, Conta, Resposta) :-
 	atom_string(Resp, R5),
 	Resposta = Resp.
 
-/*
-	ENTRADA -> Victor [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
-	SAIDA -> meta(Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
-*/
-criaStringMeta(Login, Meta, Resposta) :-
-	term_to_atom(Meta, MetaAtomo),
-	string_concat(Login, ",", L), 							% Victor,
-	string_concat(L, MetaAtomo, StringLoginMeta),			 	% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
-	string_concat(StringLoginMeta, ").", StringFinal), 		% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
-	string_concat("meta(", StringFinal, Resposta).			% meta(Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
 
 %Regra responsável por validar a senha(Se está conforme o esperado, com tamanho e caracter especial)
 %Recebo a senha como uma lista já com cada "caracter" da senha(esses caracteres são átomos)
@@ -146,12 +136,73 @@ getUsuario(Login, [H|T], R) :-
 
 criaConta(NomeConta, Codigo, Saldo, Tipo, Descricao, C) :- C = [[NomeConta, Codigo, Saldo, Tipo, Descricao]].
 
+leMetas(R) :- 
+	open('dados/metas.txt',read,Str),
+	read_transferencias(Str,Metas),
+	close(Str),
+	delete(Metas, end_of_file, NewMetas),
+	R = NewMetas.
+
+
 criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, M) :- M = [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira].
 
 cadastraMeta(Login, DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira) :-
 	criaMeta(DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira, Meta),
 	criaStringMeta(Login, Meta, MetaString),
 	salvaMeta(MetaString).
+
+/*
+	ENTRADA -> Victor [DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
+	SAIDA -> meta(Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
+*/
+criaStringMeta(Login, Meta, Resposta) :-
+	term_to_atom(Meta, MetaAtomo),
+	string_concat(Login, ",", L), 							% Victor,
+	string_concat(L, MetaAtomo, StringLoginMeta),			 	% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]
+	string_concat(StringLoginMeta, ").", StringFinal), 		% Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
+	string_concat("meta(", StringFinal, Resposta).			% meta(Victor,[DescricaoMeta, ValorAlcancar, ValorPraGuardar, Carteira]).
+
+
+getLoginMeta(meta(Login,_), Login).
+getValoresMeta(meta(_,Valores), Valores).
+
+getDescricaoMeta([Descricao,_,_,_], Descricao).
+getValorAlcancaMeta([_,ValorAlcancar,_,_], ValorAlcancar).
+getValorGuardarMeta([_,_,ValorGuardar,_], ValorGuardar).
+getCarteiraMeta([_,_,_,Carteira], Carteira).
+
+
+pegaMetasUser(_, [], ListaIntermediaria, Resposta) :- Resposta = ListaIntermediaria.
+pegaMetasUser(Login,[H|T],ListaIntermediaria, Resposta) :-
+	getLoginMeta(H, L),
+	atom_string(L, StringLogin),
+	(Login == StringLogin -> inserir_final(ListaIntermediaria, H, Lista), pegaMetasUser(Login, T, Lista, Resposta);
+		pegaMetasUser(Login, T, ListaIntermediaria,Resposta)).
+
+
+exibirMetasUsuario(Login) :-
+	leMetas(Metas),
+	pegaMetasUser(Login, Metas,[], MetasUsuario),
+	nl,write("---------#METAS#----------"),nl,
+	(MetasUsuario == [] -> nl,write("*Você ainda não possui metas!"),nl;
+	listaMetas(MetasUsuario)).
+
+listaMetas([]).
+listaMetas([H|T]):-
+	getValoresMeta(H, Valores),
+	getDescricaoMeta(Valores, Descricao),
+	getValorAlcancaMeta(Valores, ValorAlcancar),
+	getValorGuardarMeta(Valores, ValorGuardar),
+	getCarteiraMeta(Valores, Carteira),
+	exibeMeta(Descricao, ValorAlcancar, ValorGuardar, Carteira),nl,
+	listaMetas(T).
+
+exibeMeta(Descricao, ValorAlcancar, ValorGuardar, Carteira) :-
+	write("Descricao da meta: "), write(Descricao),nl,
+	write("Valor a ser alcançado: "), write(ValorAlcancar),nl,
+	write("Aporte mensal: "), write(ValorGuardar),nl,
+	write("Quanto você já tem guardado: "), write(Carteira),nl.
+
 
 listarContasUsuario(Usuario, R) :-
 	getContas(Usuario, Contas),
@@ -353,7 +404,8 @@ read_transferencias(Stream,[X|L]):-
 geraExtrato(Login) :- 
 	leTransferencias(Transferencias),
 	pegaTransacoes(Login, Transferencias,[], Resposta),
-	criaStringTransferencias(Resposta).
+	(Resposta == [] -> nl,write("*Você ainda não realizou transações!"),nl;
+	criaStringTransferencias(Resposta)).
 
 pegaTransacoes(_, [], ListaIntermediaria, Resposta) :- Resposta = ListaIntermediaria.
 pegaTransacoes(Login,[H|T],ListaIntermediaria, Resposta) :-
