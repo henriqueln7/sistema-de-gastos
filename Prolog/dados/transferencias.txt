@@ -1,0 +1,3 @@
+transacao(nicolas,"DEPOSITO",01,-1,200).
+transacao(nicolas,"SAQUE",01,-2,400).
+transacao(nicolas,"TRANSFERENCIA",02,01,300).

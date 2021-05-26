@@ -1,0 +1,3 @@
+usuario(henrique,123456,[["Banco do Brasil","01",10000,"Corrente","Amarelinho da paixao"]]).
+usuario(nicolas,123456,[["Inter","02",1000,"Corrente","Laranjinha"],["Nubank","01",1300,"Corrente","Roxinho"]]).
+usuario(victor,123456,[]).

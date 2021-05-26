@@ -1,5 +1,10 @@
 :- use_module(library(readutil)).
-:- include('Auxiliar.pl').
+:- use_module(auxiliar).
+:- use_module(usuario).
+:- use_module(persistencia).
+:- use_module(conta).
+:- use_module(meta).
+:- use_module(transacao).
 
 %Preciso fazer ainda
 %	*Checagem se já existe Login na base na hora de cadastrar um usuario
@@ -47,7 +52,7 @@ menu("L") :-
 menu("C") :-
 	write("
 Crie um login e uma senha
-A senha deve ter 6 ou mais caracteres e conter 1 caracter especial('*', '!', '@', '/', '#')\n"
+A senha deve ter 6 ou mais caracteres\n"
 ),
 	write("\nLogin: "), 
 	lerEntrada(Login), 
@@ -161,18 +166,12 @@ opcoesUsuario(Login, 7):-
 	lerNumero(ValorDeposito),
 	depositar(Login, CodigoConta, ValorDeposito), nl, menuUsuario(Login).
 
-	%FALTA IMPLEMENTAR
-	%depositar(Login, CodigoConta, ValorDeposito), nl, halt.
-
 opcoesUsuario(Login, 8):- 
 	write("\nDigite o código da conta que você vai fazer a retirada: "),
 	lerEntrada(CodigoConta),
 	write("Digite o valor a ser retirado: "),
 	lerNumero(ValorSaque),
 	sacar(Login, CodigoConta, ValorSaque), nl, menuUsuario(Login).
-
-	%FALTA IMPLEMENTAR
-	%sacar(Login, CodigoConta, ValorSaque), nl, halt.
 
 opcoesUsuario(Login, 9) :- write('Ate logo '), write(Login), menuInicial.
 opcoesUsuario(Login, _) :- write("Opção Inválida, tente novamente.", menuUsuario(Login)).
